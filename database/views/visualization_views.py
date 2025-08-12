@@ -12,7 +12,7 @@ from rest_framework.response import Response
 
 from database.models import Dataset
 
-from database.utils import path_utils
+from database.utils import path_utils, matrix_utils
 
 
 class CNAMatrixView(APIView):
@@ -37,6 +37,14 @@ class CNAMatrixView(APIView):
             with open(matrix_path, 'r', newline='') as file:
                 reader = csv.reader(file)
                 writer = csv.writer(response)
+
+                # 读取第一行（列名）
+                header = next(reader)
+                # 将第一列名称更改为 'id'
+                header[0] = 'id'
+                writer.writerow(header)  # 写入新的列名
+
+                # 逐行写入数据
                 for row in reader:
                     writer.writerow(row)
         except FileNotFoundError:
@@ -67,6 +75,14 @@ class CNAMetaView(APIView):
             with open(meta_path, 'r', newline='') as file:
                 reader = csv.reader(file)
                 writer = csv.writer(response)
+
+                # 读取第一行（列名）
+                header = next(reader)
+                # 将第一列名称更改为 'id'
+                header[0] = 'id'
+                writer.writerow(header)  # 写入新的列名
+
+                # 逐行写入数据
                 for row in reader:
                     writer.writerow(row)
         except FileNotFoundError:
@@ -170,19 +186,14 @@ class CNAGeneMatrixView(APIView):
         gene_matrix_path = path_utils.get_dataset_gene_matrix_path(dataset, workflow_type)
 
         try:
-            # 先读取 header（schema）
-            schema = pq.read_schema(gene_matrix_path)
-            all_columns = schema.names
-            first_col = all_columns[0]
+            # 提取 Gene 的 CNA 矩阵
+            df = matrix_utils.extract_matrix_from_parquet(gene_matrix_path, genes)
 
-            # 构造需要的列：第一列 + 用户指定的存在的列
-            selected_cols = [first_col] + [g for g in genes if g in all_columns and g != first_col]
-
-            # 只读取需要的列（高效）
-            df = pd.read_parquet(gene_matrix_path, engine='pyarrow', columns=selected_cols)
+            # 重命名索引为 'id'
+            df.index.name = 'id'
 
             # 转成 CSV 字符串
-            csv_str = df.to_csv(index=False)
+            csv_str = df.to_csv()
 
             # 返回 CSV
             resp = HttpResponse(csv_str, content_type='text/csv; charset=utf-8')
@@ -196,4 +207,67 @@ class CNAGeneMatrixView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class CNATermListView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+        workflow_type = request.query_params.get('workflow_type', None)
+
+        if not dataset_name or not workflow_type:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            dataset = Dataset.objects.get(name=dataset_name)
+        except Dataset.DoesNotExist:
+            return Response({'detail': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        term_matrix_path = path_utils.get_dataset_term_matrix_path(dataset, workflow_type)
+
+        try:
+            header = pq.read_schema(term_matrix_path).names[1:]
+        except FileNotFoundError:
+            return Response('CNA gene matrix file not found!', status=status.HTTP_404_NOT_FOUND)
+
+        data = [{"id": idx, "gene": gene} for idx, gene in enumerate(header)]
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class CNATermMatrixView(APIView):
+    def post(self, request):
+        dataset_name = request.data.get('datasetName', None)
+        workflow_type = request.data.get('workflowType', None)
+        terms = request.data.get('terms', None)
+
+        if not dataset_name or not workflow_type or not terms:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not isinstance(terms, list):
+            return Response({'error': 'terms must be a list'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            dataset = Dataset.objects.get(name=dataset_name)
+        except Dataset.DoesNotExist:
+            return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        term_matrix_path = path_utils.get_dataset_term_matrix_path(dataset, workflow_type)
+
+        try:
+            # 提取 Term 的 CNA 矩阵
+            df = matrix_utils.extract_matrix_from_parquet(term_matrix_path, terms)
+
+            # 重命名索引为 'id'
+            df.index.name = 'id'
+
+            # 转成 CSV 字符串
+            csv_str = df.to_csv()
+
+            # 返回 CSV
+            resp = HttpResponse(csv_str, content_type='text/csv; charset=utf-8')
+            resp['Content-Disposition'] = 'inline; filename="subset.csv"'
+
+            return resp
+        except FileNotFoundError:
+            return Response({'error': 'Term matrix file not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

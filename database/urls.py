@@ -17,4 +17,6 @@ urlpatterns = [
     path('CNA_genes/', visualization_views.CNAGeneListView.as_view(), name='CNA-gene-list'),
     path('CNA_newick/', visualization_views.CNANewickView.as_view(), name='CNA-newick'),
     path('CNA_gene_matrix/', visualization_views.CNAGeneMatrixView.as_view(), name='CNA-gene-matrix'),
+    path('CNA_terms/', visualization_views.CNATermListView.as_view(), name='CNA-term-list'),
+    path('CNA_term_matrix/', visualization_views.CNATermMatrixView.as_view(), name='CNA-term-matrix'),
 ]

@@ -63,3 +63,11 @@ def get_dataset_newick_path(dataset, workflow):
     newick_name = f'{dataset.name}.{workflow_name}.nwk'
 
     return os.path.join(data_dir, 'out', newick_name)
+
+
+def get_dataset_term_matrix_path(dataset, workflow):
+    data_dir = str(build_dataset_data_dir_path(dataset))
+    workflow_name = workflow_map.get(workflow, workflow)
+    term_matrix_name = f'{dataset.name}.{workflow_name}_term_cna.parquet'
+
+    return os.path.join(data_dir, 'out', term_matrix_name)
