@@ -11,6 +11,8 @@ from django.db import transaction
 
 
 def import_CNA_Dataset(file_path):
+    Dataset.objects.all().delete()
+
     dataset_df = pd.read_excel(file_path, 'Dataset Metadata')
 
     column_mapping = {

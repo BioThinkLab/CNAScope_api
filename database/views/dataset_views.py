@@ -1,11 +1,13 @@
+import pandas as pd
+
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.response import Response
 
 from database.models import Dataset, BulkSampleMetadata
-
 from database.serializers.dataset_serializers import DatasetSerializer, BulkSampleMetadataSerializer
+from database.utils import matrix_utils
 
 
 class DatasetListView(ReadOnlyModelViewSet):
@@ -15,7 +17,7 @@ class DatasetListView(ReadOnlyModelViewSet):
     lookup_field = 'name'
 
 
-class BulkDatasetSampleListView(APIView):
+class DatasetSampleListView(APIView):
     def get(self, request):
         # 从查询参数中获取 dataset_name
         dataset_name = request.query_params.get('dataset_name')
@@ -30,11 +32,10 @@ class BulkDatasetSampleListView(APIView):
         except Dataset.DoesNotExist:
             return Response({"detail": "Dataset not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # 获取所有对应 dataset 的样本
-        samples = dataset.samples.all()
-
-        # 使用 BulkSampleMetadataSerializer 对样本数据进行序列化
-        serializer = BulkSampleMetadataSerializer(samples, many=True)
+        try:
+            samples = matrix_utils.parse_meta_matrix(dataset, )
+        except FileNotFoundError:
+            return Response({"detail": "Meta matrix file not found."}, status=status.HTTP_404_NOT_FOUND)
 
         # 返回数据
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(samples, status=status.HTTP_200_OK)
