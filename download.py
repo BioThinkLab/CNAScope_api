@@ -6,40 +6,31 @@ import zipfile
 import logging
 import hashlib
 from datetime import datetime
-def compress_existing_files(file_list, output_zip_path, log_file_path=None):
+def compress_existing_files(file_list, output_zip_path, empty_log_path=None):
     """
     检查文件列表中的文件是否存在，将存在的文件压缩成一个zip文件
-    处理重复文件名的情况，并将日志记录到指定文件
+    处理重复文件名的情况，并将"没有找到任何文件"的情况记录到指定日志文件
     
     参数:
         file_list (list): 需要检查和压缩的文件路径列表
         output_zip_path (str): 输出的zip文件路径
-        log_file_path (str): 日志文件路径，如果为None则不记录到文件
+        empty_log_path (str): 记录空ZIP情况的日志文件路径
     
     返回:
         bool: 如果至少有一个文件被压缩则返回True，否则返回False
     """
-    # 配置日志记录
+    # 配置常规日志记录
     logger = logging.getLogger('compress_files')
     logger.setLevel(logging.INFO)
     
     # 清除现有的处理器，避免重复记录
-    logger.handlers = []
+    if logger.handlers:
+        logger.handlers = []
     
     # 添加控制台处理器
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     logger.addHandler(console_handler)
-    
-    # 如果提供了日志文件路径，添加文件处理器
-    if log_file_path:
-        file_handler = logging.FileHandler(log_file_path)
-        file_handler.setLevel(logging.INFO)
-        logger.addHandler(file_handler)
-    
-    # 记录开始压缩的时间和目标zip文件
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    logger.info(f"开始压缩文件 [{current_time}] - 目标文件: {output_zip_path}")
     
     # 过滤出存在的文件
     existing_files = []
@@ -50,11 +41,17 @@ def compress_existing_files(file_list, output_zip_path, log_file_path=None):
             if file_path:
                 logger.warning(f"文件不存在: {file_path}")
     
-    # 如果没有文件存在，记录到日志并返回False
+    # 如果没有文件存在，记录到专门的空ZIP日志文件
     if not existing_files:
         logger.warning(f"没有找到可压缩的文件，不创建zip文件: {output_zip_path}")
-        # 专门记录空输出路径到日志
-        logger.error(f"空ZIP文件未生成: {output_zip_path}")
+        
+        # 将空ZIP情况记录到指定的日志文件
+        if empty_log_path:
+            # 追加模式打开日志文件
+            with open(empty_log_path, 'a') as empty_log:
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                empty_log.write(f"[{current_time}] 空ZIP文件未生成: {output_zip_path}\n")
+        
         return False
     
     try:
@@ -97,9 +94,16 @@ def compress_existing_files(file_list, output_zip_path, log_file_path=None):
     
     except Exception as e:
         logger.error(f"压缩文件时出错: {str(e)}")
-        # 记录失败的输出路径
-        logger.error(f"ZIP文件创建失败: {output_zip_path}")
+        
+        # 将错误情况也记录到空ZIP日志文件
+        if empty_log_path:
+            with open(empty_log_path, 'a') as empty_log:
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                empty_log.write(f"[{current_time}] ZIP文件创建失败: {output_zip_path} - 错误: {str(e)}\n")
+        
         return False
+
+empty_log = "empty_zip_log.txt"
 
 for dataset in Dataset.objects.all():
     name = dataset.name
@@ -150,4 +154,4 @@ for dataset in Dataset.objects.all():
         ]
 
     zip_file_name = os.path.join('/home/platform/workspace/CNAScope/data/download_zips', f'{name}.zip')
-    compress_existing_files(all_files, zip_file_name)
+    compress_existing_files(all_files, zip_file_name, empty_log)
