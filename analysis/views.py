@@ -468,14 +468,14 @@ def query_task(request):
         # 选择适当的序列化器
         if task_type == "BasicAnnotationTask":
             serializer = BasicAnnotationTaskSerializer
-            success_status = BasicAnnotationTask.Status.SUCCESS
-            failed_status = BasicAnnotationTask.Status.FAILED
-            running_status = BasicAnnotationTask.Status.RUNNING
+            success_status = BasicAnnotationTask.Status.Success
+            failed_status = BasicAnnotationTask.Status.Failed
+            running_status = BasicAnnotationTask.Status.Running
         else:  # RecurrentCNATask
             serializer = RecurrentCNATaskSerializer
-            success_status = RecurrentCNATask.Status.SUCCESS
-            failed_status = RecurrentCNATask.Status.FAILED
-            running_status = RecurrentCNATask.Status.RUNNING
+            success_status = RecurrentCNATask.Status.Success
+            failed_status = RecurrentCNATask.Status.Failed
+            running_status = RecurrentCNATask.Status.Running
         
         # 如果任务已经完成或失败，直接返回任务信息
         if task.status in [success_status, failed_status]:
