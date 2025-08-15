@@ -114,7 +114,7 @@ def parse_bulk_meta_matrix(meta_df):
             'pfs': process_value(row['n_pfs'], is_numeric=True),
             'days_to_death': process_value(row['n_days_to_death'], is_numeric=True),
             'pfs_status': process_value(row['c_pfs_status'], is_numeric=False),
-            'vital_status': process_value(row['c_os_status'], is_numeric=False)
+            'vital_status': process_value(row['c_vital_status'], is_numeric=False)
         }
 
         # 将每行数据字典添加到结果列表中
