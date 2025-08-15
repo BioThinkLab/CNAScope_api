@@ -6,7 +6,7 @@
 #SBATCH --partition=compute            # 分区名称（根据系统调整）
 
 # 检查参数数量
-if [ $# -lt 7 ]; then
+if [ $# -lt 6 ]; then
     echo "Error: Missing arguments. Usage: sbatch $0 <uuid> <input_csv> <ref> <obs_type> <window_type> <k>"
     exit 1
 fi
