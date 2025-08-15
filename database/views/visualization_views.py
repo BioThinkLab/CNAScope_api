@@ -362,3 +362,25 @@ class GeneRecurrenceQueryView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+class PloidyDistributionView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+        workflow_type = request.query_params.get('workflow_type', None)
+
+        if not dataset_name or not workflow_type:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            dataset = Dataset.objects.get(name=dataset_name)
+        except Dataset.DoesNotExist:
+            return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        matrix_path = path_utils.get_dataset_matrix_path(dataset, workflow_type)
+
+        try:
+            bin_abundance_list = matrix_utils.calculate_abundance(matrix_path)
+        except FileNotFoundError:
+            return Response({'error': 'Matrix file not found!'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(bin_abundance_list)
+

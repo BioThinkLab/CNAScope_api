@@ -21,4 +21,5 @@ urlpatterns = [
     path('CNA_term_matrix/', visualization_views.CNATermMatrixView.as_view(), name='CNA-term-matrix'),
     path('focal_CNA_info/', visualization_views.FocalCNAInfoView.as_view(), name='focal-CNA-info'),
     path('gene_recurrence_query/', visualization_views.GeneRecurrenceQueryView.as_view(), name='gene-recurrence-query'),
+    path('ploidy_distribution/', visualization_views.PloidyDistributionView.as_view(), name='ploidy-distribution'),
 ]

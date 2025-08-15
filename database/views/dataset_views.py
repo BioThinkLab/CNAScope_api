@@ -1,5 +1,7 @@
 import pandas as pd
 
+from django.db.models import Case, When, Value, IntegerField
+
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -15,6 +17,26 @@ class DatasetListView(ReadOnlyModelViewSet):
     serializer_class = DatasetSerializer
     pagination_class = None
     lookup_field = 'name'
+
+    def get_queryset(self):
+        # 获取默认排序
+        queryset = super().get_queryset()
+
+        # 按照 status 的固定顺序排序
+        queryset = queryset.annotate(
+            source_order=Case(
+                When(source='GDC Portal', then=Value(1)),
+                When(source='cBioportal', then=Value(2)),
+                When(source='archived', then=Value(3)),
+                When(source='10x Official', then=Value(4)),
+                When(source='HSCGD', then=Value(5)),
+                When(source='scTML', then=Value(6)),
+                default=Value(7),
+                output_field=IntegerField()
+            )
+        ).order_by('source_order', 'name')  # 默认排序方式
+
+        return queryset
 
 
 class DatasetSampleListView(APIView):
