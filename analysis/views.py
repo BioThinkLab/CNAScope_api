@@ -137,7 +137,7 @@ def submit_basic_annotation_task(request):
                     "success": False,
                     "msg": f"Failed to save input file: {str(e)}"
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+            print('hahahahha')
             # 启动异步任务处理
             try:
                 sbatch_basic_annotation_task(str(task_uuid))
