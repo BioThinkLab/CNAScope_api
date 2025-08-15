@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from database.models import Dataset, BulkSampleMetadata
 from database.serializers.dataset_serializers import DatasetSerializer, BulkSampleMetadataSerializer
 from database.utils import matrix_utils
-
+import os
 
 class DatasetListView(ReadOnlyModelViewSet):
     queryset = Dataset.objects.all()
@@ -61,3 +61,22 @@ class DatasetSampleListView(APIView):
 
         # 返回数据
         return Response(samples, status=status.HTTP_200_OK)
+
+def download_dataset(request):
+    dataset_name = request.query_params.get('dataset_name')
+    if not dataset_name:
+        return Response({"detail": "dataset_name parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        dataset = Dataset.objects.get(name=dataset_name)
+    except Dataset.DoesNotExist:
+        return Response({"detail": "Dataset not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        file_path = os.path.join('/mnt/cbc_adam/platform/CNAScope/data/download_zips', f'{dataset_name}.zip')
+        with open(file_path, 'rb') as f:
+            response = Response(f.read(), content_type='application/zip')
+            response['Content-Disposition'] = f'attachment; filename="{dataset_name}.zip"'
+            return response
+    except FileNotFoundError:
+        return Response({"detail": "Data file not found."}, status=status.HTTP_404_NOT_FOUND)
