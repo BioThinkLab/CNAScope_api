@@ -103,7 +103,7 @@ def compress_existing_files(file_list, output_zip_path, empty_log_path=None):
         
         return False
 
-empty_log = "empty_zip_log.txt"
+empty_log = "/home/platform/workspace/CNAScope/data/download_zips/empty_zip_log.txt"
 
 for dataset in Dataset.objects.all():
     name = dataset.name
