@@ -54,25 +54,48 @@ for dataset in Dataset.objects.all():
     workflow = dataset.workflow
     source = dataset.source
 
-    cna_file = path_utils.get_dataset_matrix_path(dataset, workflow)
-    meta_file = path_utils.get_dataset_meta_path(dataset, workflow)
-    newick_file = path_utils.get_dataset_newick_path(dataset, workflow)
-    gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, workflow)
-    term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, workflow)
-    score_file = path_utils.get_dataset_recurrent_scores_path(dataset, workflow)
-    amp_file = path_utils.get_dataset_recurrent_gene_path(dataset, workflow, 'amp')
-    del_file = path_utils.get_dataset_recurrent_gene_path(dataset, workflow, 'del')
+    if ',' in workflow:
+        all_files = []
+        for w in workflow.split(','):
+            cna_file = path_utils.get_dataset_matrix_path(dataset, w)
+            meta_file = path_utils.get_dataset_meta_path(dataset, w)
+            newick_file = path_utils.get_dataset_newick_path(dataset, w)
+            gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, w)
+            term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, w)
+            score_file = path_utils.get_dataset_recurrent_scores_path(dataset, w)
+            amp_file = path_utils.get_dataset_recurrent_gene_path(dataset, w, 'amp')
+            del_file = path_utils.get_dataset_recurrent_gene_path(dataset, w, 'del')
 
-    all_files = [
-        cna_file,
-        meta_file,
-        newick_file,
-        gene_matrix_file,
-        term_matrix_file,
-        score_file,
-        amp_file,
-        del_file
-    ]
+            all_files += [
+                cna_file,
+                meta_file,
+                newick_file,
+                gene_matrix_file,
+                term_matrix_file,
+                score_file,
+                amp_file,
+                del_file
+            ]
+    else:
+        cna_file = path_utils.get_dataset_matrix_path(dataset, workflow)
+        meta_file = path_utils.get_dataset_meta_path(dataset, workflow)
+        newick_file = path_utils.get_dataset_newick_path(dataset, workflow)
+        gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, workflow)
+        term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, workflow)
+        score_file = path_utils.get_dataset_recurrent_scores_path(dataset, workflow)
+        amp_file = path_utils.get_dataset_recurrent_gene_path(dataset, workflow, 'amp')
+        del_file = path_utils.get_dataset_recurrent_gene_path(dataset, workflow, 'del')
+
+        all_files = [
+            cna_file,
+            meta_file,
+            newick_file,
+            gene_matrix_file,
+            term_matrix_file,
+            score_file,
+            amp_file,
+            del_file
+        ]
 
     zip_file_name = os.path.join('/home/platform/workspace/CNAScope/data/download_zips', f'{name}.zip')
     compress_existing_files(all_files, zip_file_name)
