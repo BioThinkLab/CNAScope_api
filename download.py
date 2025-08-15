@@ -21,12 +21,14 @@ def compress_existing_files(file_list, output_zip_path):
     for file_path in file_list:
         if file_path and os.path.isfile(file_path):
             existing_files.append(file_path)
-        else:
-            if file_path:
-                logging.warning(f"文件不存在: {file_path}")
+        # else:
+        #     if file_path:
+        #         logging.warning(f"文件不存在: {file_path}")
     
     # 如果没有文件存在，返回False
     if not existing_files:
+        print(file_list)
+        print(output_zip_path)
         logging.warning("没有找到可压缩的文件")
         return False
     
@@ -38,9 +40,9 @@ def compress_existing_files(file_list, output_zip_path):
                 file_name = os.path.basename(file_path)
                 # 将文件添加到zip中
                 zipf.write(file_path, file_name)
-                logging.info(f"已添加文件到压缩包: {file_path}")
+                # logging.info(f"已添加文件到压缩包: {file_path}")
         
-        logging.info(f"压缩完成，文件保存在: {output_zip_path}")
+        # logging.info(f"压缩完成，文件保存在: {output_zip_path}")
         return True
     
     except Exception as e:
