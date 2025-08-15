@@ -23,7 +23,8 @@ class BasicAnnotationTask(models.Model):
     class ValueType(models.TextChoices):
         int = 'int', 'Integer',
         log2 = 'log', 'Log',
-    
+    def get_input_file_path(instance, filename):
+        return os.path.join(settings.WORKSPACE_HOME, str(instance.uuid), 'input', 'cna.csv')
     def get_input_file_absolute_path(self):
         return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'input', 'cna.csv')
     def get_output_dir_absolute_path(self):
