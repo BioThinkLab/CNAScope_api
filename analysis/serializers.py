@@ -2,9 +2,6 @@ from rest_framework import serializers
 from .models import BasicAnnotationTask, RecurrentCNATask
 
 class BasicAnnotationTaskSerializer(serializers.ModelSerializer):
-    # 输入文件是必须的
-    input_file = serializers.FileField(required=True)
-    
     class Meta:
         model = BasicAnnotationTask
         fields = '__all__'

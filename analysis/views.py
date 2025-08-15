@@ -19,12 +19,15 @@ from .slurm_squeue import *
 
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
+@api_view(["POST"])
+@parser_classes([MultiPartParser, FormParser])
 def submit_basic_annotation_task(request):
     """
     提交基础注释任务的API端点
     
     接收多部分表单数据，包括任务参数和输入文件
     要求输入文件必须是CSV格式，且行数不超过1001行
+    直接将文件保存到input目录下的cna.csv
     """
     try:
         # 检查是否有文件上传
@@ -39,10 +42,7 @@ def submit_basic_annotation_task(request):
         
         # 检查文件扩展名
         file_name = input_file.name
-        # 移除文件名中的危险字符，防止路径遍历
-        safe_file_name = os.path.basename(file_name).replace('/', '').replace('\\', '')
-        
-        if not safe_file_name.lower().endswith('.csv'):
+        if not file_name.lower().endswith('.csv'):
             return Response({
                 "success": False,
                 "msg": "Input file must be a CSV file"
@@ -78,22 +78,23 @@ def submit_basic_annotation_task(request):
         # 创建任务 UUID
         task_uuid = uuid.uuid4()
         
-        # 准备数据 - 使用前端提供的所有参数
+        # 准备数据 - 使用前端提供的所有参数，但移除input_file
         data = request.data.copy()
         data['uuid'] = task_uuid
         data['create_time'] = timezone.now()
         
-        # 确保输入文件被包含在数据中
-        data['input_file'] = input_file
+        # 从数据中移除input_file，因为模型不再有此字段
+        if 'input_file' in data:
+            del data['input_file']
         
         # 验证和保存数据
         serializer = BasicAnnotationTaskSerializer(data=data)
         
         if serializer.is_valid():
             # 安全地构建目录路径，避免路径遍历攻击
-            base_dir = os.path.normpath(settings.WORKSPACE_HOME)
+            base_dir = os.path.abspath(os.path.normpath(settings.WORKSPACE_HOME))
             task_dir = str(task_uuid)
-            print(base_dir)
+            
             # 确保任务目录名没有危险字符
             if not all(c.isalnum() or c == '-' for c in task_dir):
                 return Response({
@@ -102,8 +103,8 @@ def submit_basic_annotation_task(request):
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # 构建安全的输入和输出目录路径
-            input_dir = os.path.normpath(os.path.join(base_dir, task_dir, 'input'))
-            output_dir = os.path.normpath(os.path.join(base_dir, task_dir, 'output'))
+            input_dir = os.path.abspath(os.path.normpath(os.path.join(base_dir, task_dir, 'input')))
+            output_dir = os.path.abspath(os.path.normpath(os.path.join(base_dir, task_dir, 'output')))
             
             # 验证构建的路径在工作空间内
             if not input_dir.startswith(base_dir) or not output_dir.startswith(base_dir):
@@ -122,14 +123,20 @@ def submit_basic_annotation_task(request):
                     "msg": f"Failed to create directories: {str(e)}"
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            # 保存任务 - 默认字段会由模型自动设置
+            # 保存任务 - 现在不包含input_file字段
             task = serializer.save()
             
-            # 手动将文件保存到指定位置（避免使用Django的file_field自动保存逻辑）
-            safe_file_path = os.path.join(input_dir, safe_file_name)
-            with open(safe_file_path, 'wb+') as destination:
-                for chunk in input_file.chunks():
-                    destination.write(chunk)
+            # 手动将文件保存到指定位置，固定文件名为cna.csv
+            file_path = os.path.join(input_dir, 'cna.csv')
+            try:
+                with open(file_path, 'wb+') as destination:
+                    for chunk in input_file.chunks():
+                        destination.write(chunk)
+            except Exception as e:
+                return Response({
+                    "success": False,
+                    "msg": f"Failed to save input file: {str(e)}"
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             # 启动异步任务处理
             try:
@@ -146,7 +153,7 @@ def submit_basic_annotation_task(request):
                 "msg": "Task submitted successfully",
                 "data": {
                     "uuid": str(task_uuid),
-                    "name": task.name,
+                    "name": task.name if hasattr(task, 'name') else '',  # 检查name字段是否存在
                     "user": task.user,
                     "status": task.get_status_display(),  # 获取可读的状态名称
                     "create_time": timezone.localtime(task.create_time).strftime("%Y-%m-%d %H:%M:%S"),
@@ -155,7 +162,7 @@ def submit_basic_annotation_task(request):
                     "window_type": task.get_window_type_display(),  # 获取可读的窗口类型
                     "value_type": task.get_value_type_display(),  # 获取可读的值类型
                     "k": task.k,
-                    "input_file_name": safe_file_name,
+                    "input_file_name": "cna.csv",  # 固定为cna.csv
                     "row_count": row_count  # 返回CSV的行数
                 }
             }, status=status.HTTP_201_CREATED)
@@ -176,7 +183,8 @@ def submit_basic_annotation_task(request):
             "success": False,
             "msg": f"Server error: {str(e)}"
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
 def submit_recurrent_cna_task(request):

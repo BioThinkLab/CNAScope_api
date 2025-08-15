@@ -24,12 +24,8 @@ class BasicAnnotationTask(models.Model):
         int = 'int', 'Integer',
         log2 = 'log', 'Log',
     
-    def get_input_file_path(instance):
-        return os.path.join(settings.WORKSPACE_HOME, str(instance.uuid), 'input', 'cna.csv')
     def get_input_file_absolute_path(self):
-        if self.input_file:
-            return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'input', 'cna.csv')
-        return None
+        return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'input', 'cna.csv')
     def get_output_dir_absolute_path(self):
         return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'output')
 
@@ -43,7 +39,6 @@ class BasicAnnotationTask(models.Model):
     obs_type = models.CharField(choices=ObsType.choices, default=ObsType.bulk)
     window_type = models.CharField(choices=WindowType.choices, default=WindowType.bin)
     value_type = models.CharField(choices=ValueType.choices, default=ValueType.int)
-    input_file = models.FileField(upload_to=get_input_file_path, null=True, blank=True)
 
 class RecurrentCNATask(models.Model):
     class Status(models.TextChoices):
