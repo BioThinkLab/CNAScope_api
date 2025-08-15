@@ -39,7 +39,10 @@ def submit_basic_annotation_task(request):
         
         # 检查文件扩展名
         file_name = input_file.name
-        if not file_name.lower().endswith('.csv'):
+        # 移除文件名中的危险字符，防止路径遍历
+        safe_file_name = os.path.basename(file_name).replace('/', '').replace('\\', '')
+        
+        if not safe_file_name.lower().endswith('.csv'):
             return Response({
                 "success": False,
                 "msg": "Input file must be a CSV file"
@@ -87,17 +90,55 @@ def submit_basic_annotation_task(request):
         serializer = BasicAnnotationTaskSerializer(data=data)
         
         if serializer.is_valid():
-            # 确保目录存在
-            input_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'input')
-            output_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'output')
-            os.makedirs(input_dir, exist_ok=True)
-            os.makedirs(output_dir, exist_ok=True)
+            # 安全地构建目录路径，避免路径遍历攻击
+            base_dir = os.path.normpath(settings.WORKSPACE_HOME)
+            task_dir = str(task_uuid)
+            
+            # 确保任务目录名没有危险字符
+            if not all(c.isalnum() or c == '-' for c in task_dir):
+                return Response({
+                    "success": False,
+                    "msg": "Invalid task UUID format"
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # 构建安全的输入和输出目录路径
+            input_dir = os.path.normpath(os.path.join(base_dir, task_dir, 'input'))
+            output_dir = os.path.normpath(os.path.join(base_dir, task_dir, 'output'))
+            
+            # 验证构建的路径在工作空间内
+            if not input_dir.startswith(base_dir) or not output_dir.startswith(base_dir):
+                return Response({
+                    "success": False,
+                    "msg": "Path traversal detected"
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+            # 创建目录
+            try:
+                os.makedirs(input_dir, exist_ok=True)
+                os.makedirs(output_dir, exist_ok=True)
+            except OSError as e:
+                return Response({
+                    "success": False, 
+                    "msg": f"Failed to create directories: {str(e)}"
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             # 保存任务 - 默认字段会由模型自动设置
             task = serializer.save()
             
-            # 启动异步任务处理 (如果需要)
-            sbatch_basic_annotation_task(str(task_uuid))
+            # 手动将文件保存到指定位置（避免使用Django的file_field自动保存逻辑）
+            safe_file_path = os.path.join(input_dir, safe_file_name)
+            with open(safe_file_path, 'wb+') as destination:
+                for chunk in input_file.chunks():
+                    destination.write(chunk)
+            
+            # 启动异步任务处理
+            try:
+                sbatch_basic_annotation_task(str(task_uuid))
+            except Exception as e:
+                return Response({
+                    "success": False,
+                    "msg": f"Failed to submit task to processing system: {str(e)}"
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             # 返回成功信息
             return Response({
@@ -114,7 +155,7 @@ def submit_basic_annotation_task(request):
                     "window_type": task.get_window_type_display(),  # 获取可读的窗口类型
                     "value_type": task.get_value_type_display(),  # 获取可读的值类型
                     "k": task.k,
-                    "input_file_name": os.path.basename(task.input_file.name),
+                    "input_file_name": safe_file_name,
                     "row_count": row_count  # 返回CSV的行数
                 }
             }, status=status.HTTP_201_CREATED)
@@ -135,7 +176,7 @@ def submit_basic_annotation_task(request):
             "success": False,
             "msg": f"Server error: {str(e)}"
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
 def submit_recurrent_cna_task(request):
