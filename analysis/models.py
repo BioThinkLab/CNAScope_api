@@ -22,7 +22,7 @@ class BasicAnnotationTask(models.Model):
         gene = 'gene', 'Gene',
     class ValueType(models.TextChoices):
         int = 'int', 'Integer',
-        log2 = 'log', 'Log',
+        log = 'log', 'Log',
     def get_input_file_path(instance, filename):
         return os.path.join(settings.WORKSPACE_HOME, str(instance.uuid), 'input', 'cna.csv')
     def get_input_file_absolute_path(self):
