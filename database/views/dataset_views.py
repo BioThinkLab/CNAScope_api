@@ -55,7 +55,7 @@ class DatasetSampleListView(APIView):
             return Response({"detail": "Dataset not found."}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            samples = matrix_utils.parse_meta_matrix(dataset, )
+            samples = matrix_utils.parse_meta_matrix(dataset)
         except FileNotFoundError:
             return Response({"detail": "Meta matrix file not found."}, status=status.HTTP_404_NOT_FOUND)
 

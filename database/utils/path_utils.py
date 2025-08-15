@@ -62,10 +62,17 @@ def build_dataset_prefix(dataset, workflow):
 def get_dataset_samples_path(dataset):
     data_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.modality == 'bulkDNA':
         meta_name = f'{dataset.name}.meta.csv'
 
         return os.path.join(data_dir, 'clean', meta_name)
+
+    else:
+        workflow_name = workflow_map.get(dataset.workflow, dataset.workflow)
+        meta_name = f'{dataset.name}.{workflow_name}.meta.csv'
+
+        return os.path.join(data_dir, 'clean', meta_name)
+
 
 
 def get_dataset_matrix_path(dataset, workflow):
