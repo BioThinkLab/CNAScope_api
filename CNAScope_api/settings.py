@@ -142,3 +142,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 30
 }
+
+# Custom settings
+WORKSPACE_HOME = os.path.join(BASE_DIR, 'workspace')
+SLURM_SCRIPT_HOME = os.path.join(BASE_DIR, 'scripts', 'slurm_task')
