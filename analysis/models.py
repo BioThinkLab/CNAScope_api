@@ -25,10 +25,10 @@ class BasicAnnotationTask(models.Model):
         log2 = 'log', 'Log',
     
     def get_input_file_path(instance, filename):
-        return os.path.join(settings.WORKSPACE_HOME, str(instance.uuid), 'input', filename)
+        return os.path.join(settings.WORKSPACE_HOME, str(instance.uuid), 'input', 'cna.csv')
     def get_input_file_absolute_path(self):
         if self.input_file:
-            return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'input', os.path.basename(self.input_file.name))
+            return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'input', 'cna.csv')
         return None
     def get_output_dir_absolute_path(self):
         return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'output')
