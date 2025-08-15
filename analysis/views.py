@@ -84,13 +84,14 @@ def submit_basic_annotation_task(request):
         data['create_time'] = timezone.now()
         
         # 确保输入文件被包含在数据中
-        # data['input_file'] = input_file
+        data['input_file'] = input_file
         
         # 验证和保存数据
         serializer = BasicAnnotationTaskSerializer(data=data)
         
         if serializer.is_valid():
             # 安全地构建目录路径，避免路径遍历攻击
+            print('base_dir')
             base_dir = os.path.normpath(settings.WORKSPACE_HOME)
             task_dir = str(task_uuid)
             
