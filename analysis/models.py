@@ -24,7 +24,7 @@ class BasicAnnotationTask(models.Model):
         int = 'int', 'Integer',
         log2 = 'log', 'Log',
     
-    def get_input_file_path(instance, filename):
+    def get_input_file_path(instance):
         return os.path.join(settings.WORKSPACE_HOME, str(instance.uuid), 'input', 'cna.csv')
     def get_input_file_absolute_path(self):
         if self.input_file:
