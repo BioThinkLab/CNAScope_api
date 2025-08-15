@@ -19,8 +19,6 @@ from .slurm_squeue import *
 
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
-@api_view(["POST"])
-@parser_classes([MultiPartParser, FormParser])
 def submit_basic_annotation_task(request):
     """
     提交基础注释任务的API端点
@@ -96,7 +94,7 @@ def submit_basic_annotation_task(request):
             task = serializer.save()
             input_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'input')
             os.makedirs(input_dir, exist_ok=True)
-            
+
             # 手动将文件保存到指定位置，固定文件名为cna.csv
             file_path = os.path.join(input_dir, 'cna.csv')
             try:
