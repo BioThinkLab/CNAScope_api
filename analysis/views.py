@@ -84,7 +84,7 @@ def submit_basic_annotation_task(request):
         data['create_time'] = timezone.now()
         
         # 确保输入文件被包含在数据中
-        data['input_file'] = input_file
+        # data['input_file'] = input_file
         
         # 验证和保存数据
         serializer = BasicAnnotationTaskSerializer(data=data)
