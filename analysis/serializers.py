@@ -43,7 +43,6 @@ class BasicAnnotationTaskSerializer(serializers.ModelSerializer):
 
 class RecurrentCNATaskSerializer(serializers.ModelSerializer):
     # 输入文件是必须的
-    input_file = serializers.FileField(required=True)
     
     class Meta:
         model = RecurrentCNATask
