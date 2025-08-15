@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --ntasks=1                     # 使用的任务数量
 #SBATCH --cpus-per-task=20            # 每个任务使用的CPU核心数量
-#SBATCH --mem=2G                       # 内存需求
+#SBATCH --mem=23G                       # 内存需求
 #SBATCH --time=00:30:00                # 最大运行时间 (格式为HH:MM:SS)
 #SBATCH --partition=compute            # 分区名称（根据系统调整）
 
