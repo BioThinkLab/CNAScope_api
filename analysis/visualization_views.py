@@ -366,9 +366,18 @@ class FocalCNAInfoView(APIView):
                 }, status=status.HTTP_404_NOT_FOUND)
 
         output_dir = task.get_output_dir_absolute_path()
-        amp_gene_path = os.path.join(output_dir, f'gistic_{task_uuid}', 'amp_genes.conf_95.txt')
-        del_gene_path = os.path.join(output_dir, f'gistic_{task_uuid}', 'del_genes.conf_95.txt')
-        scores_path = os.path.join(output_dir, f'gistic_{task_uuid}', 'scores.gistic')
+
+        files = os.listdir(output_dir)
+
+        file_name_without_extension = task_uuid
+        for file in files:
+            if file.endswith(".ok"):
+                file_name_without_extension = os.path.splitext(file)[0]
+                break  # 只获取一个文件后退出循环
+
+        amp_gene_path = os.path.join(output_dir, f'gistic_{file_name_without_extension}', 'amp_genes.conf_95.txt')
+        del_gene_path = os.path.join(output_dir, f'gistic_{file_name_without_extension}', 'del_genes.conf_95.txt')
+        scores_path = os.path.join(output_dir, f'gistic_{file_name_without_extension}', 'scores.gistic')
 
         amp_regions_info = recurrent_utils.parse_recurrent_regions(amp_gene_path)
         del_regions_info = recurrent_utils.parse_recurrent_regions(del_gene_path)
