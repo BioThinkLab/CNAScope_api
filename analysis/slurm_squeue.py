@@ -1,6 +1,6 @@
 import subprocess
 import os
-from djang.conf import settings
+from django.conf import settings
 
 sep = '/'
 
