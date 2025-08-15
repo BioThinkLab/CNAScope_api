@@ -91,10 +91,9 @@ def submit_basic_annotation_task(request):
         
         if serializer.is_valid():
             # 安全地构建目录路径，避免路径遍历攻击
-            print('base_dir')
             base_dir = os.path.normpath(settings.WORKSPACE_HOME)
             task_dir = str(task_uuid)
-            
+            print(base_dir)
             # 确保任务目录名没有危险字符
             if not all(c.isalnum() or c == '-' for c in task_dir):
                 return Response({
