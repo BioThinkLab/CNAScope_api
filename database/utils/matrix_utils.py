@@ -57,7 +57,7 @@ def calculate_abundance(file_path):
         ) from e
 
 
-def parse_bulk_meta_matrix(meta_df):
+def parse_GDC_bulk_meta_matrix(meta_df):
     result = []
 
     def process_value(value, is_numeric=False):
@@ -80,6 +80,39 @@ def parse_bulk_meta_matrix(meta_df):
             'age': process_value(row['n_age'], is_numeric=True),
             'pfs': process_value(row['n_pfs'], is_numeric=True),
             'days_to_death': process_value(row['n_os'], is_numeric=True),
+            'pfs_status': process_value(row['c_pfs_status'], is_numeric=False),
+            'vital_status': process_value(row['c_os_status'], is_numeric=False)
+        }
+
+        # 将每行数据字典添加到结果列表中
+        result.append(sample_data)
+
+    return result
+
+
+def parse_bulk_meta_matrix(meta_df):
+    result = []
+
+    def process_value(value, is_numeric=False):
+        if pd.isna(value):
+            return None if is_numeric else ''
+        return value
+
+    for index, row in meta_df.iterrows():
+        # 构建字典，键对应模型字段，值对应 DataFrame 中的值
+        sample_data = {
+            'sample_id': process_value(row['sample_id'], is_numeric=False),
+            'dataset_name': process_value(row['dataset_name'], is_numeric=False),
+            'disease_type': process_value(row['c_disease_type'], is_numeric=False),
+            'primary_site': process_value(row['c_primiary_site'], is_numeric=False),
+            'tumor_stage': process_value(row['c_tumor_stage'], is_numeric=False),
+            'tumor_grade': process_value(row['c_tumor_grade'], is_numeric=False),
+            'ethnicity': process_value(row['c_ethinicity'], is_numeric=False),
+            'race': process_value(row['c_race'], is_numeric=False),
+            'gender': process_value(row['c_gender'], is_numeric=False),
+            'age': process_value(row['n_age'], is_numeric=True),
+            'pfs': process_value(row['n_pfs'], is_numeric=True),
+            'days_to_death': process_value(row['n_days_to_death'], is_numeric=True),
             'pfs_status': process_value(row['c_pfs_status'], is_numeric=False),
             'vital_status': process_value(row['c_os_status'], is_numeric=False)
         }
@@ -195,7 +228,10 @@ def parse_meta_matrix(dataset):
         ) from e
 
     if dataset.modality == 'bulkDNA':
-        return parse_bulk_meta_matrix(meta_df)
+        if dataset.source == 'GDC Portal':
+            return parse_GDC_bulk_meta_matrix(meta_df)
+        else:
+            return parse_bulk_meta_matrix(meta_df)
     elif dataset.modality == 'scDNA':
         if dataset.source == '10x Official':
             return parse_scDNA_10x_meta_matrix(meta_df)
