@@ -4,49 +4,101 @@ from database.utils import path_utils, matrix_utils, recurrent_utils
 import os
 import zipfile
 import logging
-
-def compress_existing_files(file_list, output_zip_path):
+import hashlib
+from datetime import datetime
+def compress_existing_files(file_list, output_zip_path, log_file_path=None):
     """
     检查文件列表中的文件是否存在，将存在的文件压缩成一个zip文件
+    处理重复文件名的情况，并将日志记录到指定文件
     
     参数:
         file_list (list): 需要检查和压缩的文件路径列表
         output_zip_path (str): 输出的zip文件路径
+        log_file_path (str): 日志文件路径，如果为None则不记录到文件
     
     返回:
         bool: 如果至少有一个文件被压缩则返回True，否则返回False
     """
+    # 配置日志记录
+    logger = logging.getLogger('compress_files')
+    logger.setLevel(logging.INFO)
+    
+    # 清除现有的处理器，避免重复记录
+    logger.handlers = []
+    
+    # 添加控制台处理器
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    logger.addHandler(console_handler)
+    
+    # 如果提供了日志文件路径，添加文件处理器
+    if log_file_path:
+        file_handler = logging.FileHandler(log_file_path)
+        file_handler.setLevel(logging.INFO)
+        logger.addHandler(file_handler)
+    
+    # 记录开始压缩的时间和目标zip文件
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    logger.info(f"开始压缩文件 [{current_time}] - 目标文件: {output_zip_path}")
+    
     # 过滤出存在的文件
     existing_files = []
     for file_path in file_list:
         if file_path and os.path.isfile(file_path):
             existing_files.append(file_path)
-        # else:
-        #     if file_path:
-        #         logging.warning(f"文件不存在: {file_path}")
+        else:
+            if file_path:
+                logger.warning(f"文件不存在: {file_path}")
     
-    # 如果没有文件存在，返回False
+    # 如果没有文件存在，记录到日志并返回False
     if not existing_files:
-        print(file_list)
-        print(output_zip_path)
-        logging.warning("没有找到可压缩的文件")
+        logger.warning(f"没有找到可压缩的文件，不创建zip文件: {output_zip_path}")
+        # 专门记录空输出路径到日志
+        logger.error(f"空ZIP文件未生成: {output_zip_path}")
         return False
     
     try:
+        # 创建用于跟踪文件名的字典
+        file_names = {}
+        
         # 创建zip文件
         with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for file_path in existing_files:
-                # 获取文件名，不包含路径
-                file_name = os.path.basename(file_path)
-                # 将文件添加到zip中
-                zipf.write(file_path, file_name)
-                # logging.info(f"已添加文件到压缩包: {file_path}")
+                # 获取基本文件名
+                base_name = os.path.basename(file_path)
+                
+                # 检查文件名是否已存在
+                if base_name in file_names.values():
+                    # 使用路径的一部分创建唯一文件名
+                    dir_name = os.path.dirname(file_path)
+                    hash_prefix = hashlib.md5(dir_name.encode()).hexdigest()[:8]
+                    unique_name = f"{hash_prefix}_{base_name}"
+                    
+                    # 如果仍然冲突，添加索引号
+                    original_unique_name = unique_name
+                    counter = 1
+                    while unique_name in file_names.values():
+                        unique_name = f"{original_unique_name}_{counter}"
+                        counter += 1
+                    
+                    # 保存文件并记录唯一文件名
+                    zipf.write(file_path, unique_name)
+                    file_names[file_path] = unique_name
+                    logger.info(f"已添加文件到压缩包(重命名): {file_path} -> {unique_name}")
+                else:
+                    # 直接保存文件并记录文件名
+                    zipf.write(file_path, base_name)
+                    file_names[file_path] = base_name
+                    logger.info(f"已添加文件到压缩包: {file_path}")
         
-        # logging.info(f"压缩完成，文件保存在: {output_zip_path}")
+        logger.info(f"压缩完成，文件保存在: {output_zip_path}")
+        logger.info(f"总共压缩了 {len(existing_files)} 个文件")
         return True
     
     except Exception as e:
-        logging.error(f"压缩文件时出错: {str(e)}")
+        logger.error(f"压缩文件时出错: {str(e)}")
+        # 记录失败的输出路径
+        logger.error(f"ZIP文件创建失败: {output_zip_path}")
         return False
 
 for dataset in Dataset.objects.all():
