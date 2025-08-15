@@ -473,11 +473,14 @@ def query_task(request):
             success_status = BasicAnnotationTask.Status.Success
             failed_status = BasicAnnotationTask.Status.Failed
             running_status = BasicAnnotationTask.Status.Running
+            pending_status = BasicAnnotationTask.Status.Pending
         else:  # RecurrentCNATask
             serializer = RecurrentCNATaskSerializer
             success_status = RecurrentCNATask.Status.Success
             failed_status = RecurrentCNATask.Status.Failed
             running_status = RecurrentCNATask.Status.Running
+            pending_status = BasicAnnotationTask.Status.Pending
+
         
         # 如果任务已经完成或失败，直接返回任务信息
         if task.status in [success_status, failed_status]:
@@ -543,18 +546,12 @@ def query_task(request):
         
         elif task_status.startswith('PD'):
             # 任务正在队列中等待
-            task_data = serializer(task).data
-            # 提取队列位置
-            parts = task_status.split(' ')
-            if len(parts) > 1:
-                queue_position = parts[1]
-                task_data['position'] = queue_position
-            else:
-                task_data['position'] = "unknown"
+            task.status = pending_status
+            task.save()
             
             return Response({
                 "success": True,
-                "data": task_data,
+                "data": serializer(task).data,
                 "task_type": task_type
             }, status=status.HTTP_200_OK)
         
