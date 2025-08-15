@@ -10,7 +10,7 @@ def sbatch_basic_annotation_task(uuid):
     output_dir = task.get_output_dir_absolute_path()
     command = [
         "sbatch",
-        f"--job-name={uuid.replace('-', '_')}",
+        f"--job-name={str(uuid).replace('-', '_')}",
         f"--output={output_dir}{seperator}Pipeline.out",
         f"--error={output_dir}{seperator}Pipeline.err",
         f"{settings.SLURM_SCRIPT_HOME}{seperator}run_basic_cna_anno.sh",
@@ -35,7 +35,7 @@ def sbatch_recurrent_cna_task(uuid, input_files):
     output_dir = task.get_output_dir_absolute_path()
     command = [
         "sbatch",
-        f"--job-name={uuid.replace('-', '_')}",
+        f"--job-name={str(uuid).replace('-', '_')}",
         f"--output={output_dir}{seperator}Pipeline.out",
         f"--error={output_dir}{seperator}Pipeline.err",
         f"{settings.SLURM_SCRIPT_HOME}{seperator}run_recurrent_cna_task.sh",
