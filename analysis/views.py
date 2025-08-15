@@ -91,40 +91,11 @@ def submit_basic_annotation_task(request):
         serializer = BasicAnnotationTaskSerializer(data=data)
         
         if serializer.is_valid():
-            # 安全地构建目录路径，避免路径遍历攻击
-            base_dir = os.path.abspath(os.path.normpath(settings.WORKSPACE_HOME))
-            task_dir = str(task_uuid)
-            
-            # 确保任务目录名没有危险字符
-            if not all(c.isalnum() or c == '-' for c in task_dir):
-                return Response({
-                    "success": False,
-                    "msg": "Invalid task UUID format"
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # 构建安全的输入和输出目录路径
-            input_dir = os.path.abspath(os.path.normpath(os.path.join(base_dir, task_dir, 'input')))
-            output_dir = os.path.abspath(os.path.normpath(os.path.join(base_dir, task_dir, 'output')))
-            
-            # 验证构建的路径在工作空间内
-            if not input_dir.startswith(base_dir) or not output_dir.startswith(base_dir):
-                return Response({
-                    "success": False,
-                    "msg": "Path traversal detected"
-                }, status=status.HTTP_400_BAD_REQUEST)
-                
-            # 创建目录
-            try:
-                os.makedirs(input_dir, exist_ok=True)
-                os.makedirs(output_dir, exist_ok=True)
-            except OSError as e:
-                return Response({
-                    "success": False, 
-                    "msg": f"Failed to create directories: {str(e)}"
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             # 保存任务 - 现在不包含input_file字段
             task = serializer.save()
+            input_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'input')
+            os.makedirs(input_dir, exist_ok=True)
             
             # 手动将文件保存到指定位置，固定文件名为cna.csv
             file_path = os.path.join(input_dir, 'cna.csv')
