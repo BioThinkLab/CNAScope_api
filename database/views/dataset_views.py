@@ -6,6 +6,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from database.models import Dataset, BulkSampleMetadata
 from database.serializers.dataset_serializers import DatasetSerializer, BulkSampleMetadataSerializer
@@ -62,6 +63,7 @@ class DatasetSampleListView(APIView):
         # 返回数据
         return Response(samples, status=status.HTTP_200_OK)
 
+@api_view(["GET"])
 def download_dataset(request):
     dataset_name = request.query_params.get('dataset_name')
     if not dataset_name:
