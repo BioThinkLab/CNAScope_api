@@ -102,7 +102,9 @@ def submit_basic_annotation_task(request):
                 value_type=request.data.get('value_type', BasicAnnotationTask.ValueType.int)
             )
             input_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'input')
+            output_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'output')
             os.makedirs(input_dir, exist_ok=True)
+            os.makedirs(output_dir, exist_ok=True)
 
             # 手动将文件保存到指定位置，固定文件名为cna.csv
             file_path = os.path.join(input_dir, 'cna.csv')
