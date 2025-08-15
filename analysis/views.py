@@ -134,7 +134,7 @@ def submit_basic_annotation_task(request):
                     "window_type": task.get_window_type_display(),  # 获取可读的窗口类型
                     "value_type": task.get_value_type_display(),  # 获取可读的值类型
                     "k": task.k,
-                    "input_file_name": "cna.csv",  # 固定为cna.csv
+                    "input_file_name": task.get_input_file_absolute_path(),  # 固定为cna.csv
                     "row_count": row_count  # 返回CSV的行数
                 }
             }, status=status.HTTP_201_CREATED)
@@ -382,13 +382,12 @@ def submit_recurrent_cna_task(request):
                 "msg": "Task submitted successfully",
                 "data": {
                     "uuid": str(task_uuid),
-                    "name": task.name,
                     "user": task.user,
                     "status": task.get_status_display(),
                     "create_time": timezone.localtime(task.create_time).strftime("%Y-%m-%d %H:%M:%S"),
                     "ref": task.ref,
                     "obs_type": task.get_obs_type_display(),
-                    "input_file_name": os.path.basename(task.input_file.name),
+                    "input_file_name": task.get_input_file_absolute_path(),
                     "input_files": valid_csv_paths,  # 包含所有有效CSV文件的路径
                     "file_info": file_info  # 包含文件类型和CSV文件信息
                 }
