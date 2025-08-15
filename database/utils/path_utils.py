@@ -106,6 +106,12 @@ def get_dataset_gene_matrix_path(dataset, workflow):
 
     return os.path.join(data_dir, 'out', gene_matrix_name)
 
+def get_dataset_gene_matrix_csv_path(dataset, workflow):
+    data_dir = str(build_dataset_data_dir_path(dataset))
+    workflow_name = workflow_map.get(workflow, workflow)
+    gene_matrix_name = f'{dataset.name}.{workflow_name}_gene_cna.csv.gz'
+
+    return os.path.join(data_dir, 'out', gene_matrix_name)
 
 def get_dataset_newick_path(dataset, workflow):
     data_dir = str(build_dataset_data_dir_path(dataset))
@@ -122,6 +128,12 @@ def get_dataset_term_matrix_path(dataset, workflow):
 
     return os.path.join(data_dir, 'out', term_matrix_name)
 
+def get_dataset_term_matrix_csv_path(dataset, workflow):
+    data_dir = str(build_dataset_data_dir_path(dataset))
+    workflow_name = workflow_map.get(workflow, workflow)
+    term_matrix_name = f'{dataset.name}.{workflow_name}_term_cna.csv.gz'
+
+    return os.path.join(data_dir, 'out', term_matrix_name)
 
 def get_dataset_recurrent_scores_path(dataset, workflow):
     data_dir = str(build_dataset_data_dir_path(dataset))

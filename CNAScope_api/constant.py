@@ -1,1 +1,1 @@
-DATA_HOME = 'E:\\WebProject\\CNAScope\\data'
+DATA_HOME = '/home/platform/workspace/CNAScope/data'
