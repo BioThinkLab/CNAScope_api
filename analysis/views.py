@@ -78,9 +78,7 @@ def submit_basic_annotation_task(request):
         
         # 准备数据 - 使用前端提供的所有参数，但移除input_file
         data = request.data.copy()
-        data['uuid'] = task_uuid
-        data['create_time'] = timezone.now()
-        
+        data['uuid'] = task_uuid        
         # 从数据中移除input_file，因为模型不再有此字段
         if 'input_file' in data:
             del data['input_file']
@@ -89,9 +87,20 @@ def submit_basic_annotation_task(request):
         serializer = BasicAnnotationTaskSerializer(data=data)
         
         if serializer.is_valid():
-            
+            current_time = timezone.now()
+
             # 保存任务 - 现在不包含input_file字段
-            task = serializer.save()
+            task = BasicAnnotationTask.objects.create(
+                uuid=task_uuid,
+                user=request.data.get('user', ''),
+                status=BasicAnnotationTask.Status.Pending,
+                create_time=current_time,
+                k=request.data.get('k', 10),
+                ref=request.data.get('ref', BasicAnnotationTask.Ref.hg38),
+                obs_type=request.data.get('obs_type', BasicAnnotationTask.ObsType.bulk),
+                window_type=request.data.get('window_type', BasicAnnotationTask.WindowType.bin),
+                value_type=request.data.get('value_type', BasicAnnotationTask.ValueType.int)
+            )
             input_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'input')
             os.makedirs(input_dir, exist_ok=True)
 
