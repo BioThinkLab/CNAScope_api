@@ -43,7 +43,7 @@ def get_dataset_samples_path(dataset):
 def get_dataset_matrix_path(dataset, workflow):
     data_dir = str(build_dataset_data_dir_path(dataset))
     workflow_name = workflow_map.get(workflow, workflow)
-    matrix_name = f'{dataset.name}.{workflow_name}.CNA.csv'
+    matrix_name = f'{dataset.name}.{workflow_name}.cna.csv'
 
     return os.path.join(data_dir, 'clean', matrix_name)
 
