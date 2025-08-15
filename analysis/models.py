@@ -59,11 +59,9 @@ class RecurrentCNATask(models.Model):
         log2 = 'log', 'Log',
     
     def get_input_file_path(instance, filename):
-        return os.path.join(settings.WORKSPACE_HOME, str(instance.uuid), 'input', filename)
+        return os.path.join(settings.WORKSPACE_HOME, str(instance.uuid), 'input', 'cna.csv')
     def get_input_file_absolute_path(self):
-        if self.input_file:
-            return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'input', os.path.basename(self.input_file.name))
-        return None
+        return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'input', 'cna.csv')
     def get_output_dir_absolute_path(self):
         return os.path.join(settings.WORKSPACE_HOME, str(self.uuid), 'output')
 
@@ -75,4 +73,4 @@ class RecurrentCNATask(models.Model):
     ref = models.CharField(choices=Ref.choices, default=Ref.hg38)
     obs_type = models.CharField(choices=ObsType.choices, default=ObsType.bulk)
     value_type = models.CharField(choices=ValueType.choices, default=ValueType.int)
-    input_file = models.FileField(upload_to=get_input_file_path, null=True, blank=True)
+    # input_file = models.FileField(upload_to=get_input_file_path, null=True, blank=True)

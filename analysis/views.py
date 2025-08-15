@@ -210,7 +210,7 @@ def submit_recurrent_cna_task(request):
                     }, status=status.HTTP_400_BAD_REQUEST)
                     
                 # CSV文件通过验证，保存到输入目录
-                csv_path = os.path.join(input_dir, file_name)
+                csv_path = os.path.join(input_dir, 'cna.csv')
                 with open(csv_path, 'wb') as dest_file:
                     input_file.seek(0)
                     for chunk in input_file.chunks():
@@ -363,8 +363,15 @@ def submit_recurrent_cna_task(request):
         
         if serializer.is_valid():
             # 保存任务
-            task = serializer.save()
-            task.save()
+            # task = serializer.save()
+            # task.save()
+            task = RecurrentCNATask.objects.create(
+                uuid=task_uuid,
+                user=request.data.get('user', ''),
+                create_time=timezone.now(),
+                ref=request.data.get('ref', RecurrentCNATask.Ref.hg38),
+                obs_type=request.data.get('obs_type', RecurrentCNATask.ObsType.bulk),
+            )
             
             # 启动异步任务处理 (如果需要)
             sbatch_recurrent_cna_task(str(task_uuid), input_files_str)
