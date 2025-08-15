@@ -17,4 +17,5 @@ urlpatterns = [
     path('focal_CNA_info/', visualization_views.FocalCNAInfoView.as_view(), name='focal-CNA-info'),
     path('gene_recurrence_query/', visualization_views.GeneRecurrenceQueryView.as_view(), name='gene-recurrence-query'),
     path('ploidy_distribution/', visualization_views.PloidyDistributionView.as_view(), name='ploidy-distribution'),
+    path('run_demo/', run_demo, name='run_demo'),
 ]

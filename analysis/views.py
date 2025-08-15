@@ -571,4 +571,163 @@ def query_task(request):
             "success": False,
             "msg": f"Server error: {str(e)}"
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(["GET"])
+def run_demo(request):
+    """
+    查询任务状态的API端点
     
+    接收GET请求，通过任务UUID查询任务的当前状态
+    支持查询BasicAnnotationTask或RecurrentCNATask类型的任务
+    """
+    try:
+        # 获取任务UUID
+        name = request.query_params.get('name', 'TCGA-ACC')
+        task_uuid = uuid.uuid4()
+        input_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'input')
+        output_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'output')
+        os.makedirs(input_dir, exist_ok=True)
+        os.makedirs(output_dir, exist_ok=True)
+
+        demo_data_folder = '/mnt/cbc_adam/platform/CNAScope/demo/clean'
+        if name == 'TCGA-ACC':
+            input_file_path = os.path.join(demo_data_folder, 'TCGA-ACC.ascatNGS.cna.csv')
+            input_file = os.path.join(input_dir, 'cna.csv')
+            shutil.copy(input_file_path, input_file)
+            task = BasicAnnotationTask.objects.create(
+                uuid=task_uuid,
+                user=task_uuid,
+                status=BasicAnnotationTask.Status.Pending,
+                create_time=timezone.now(),
+                k=50,
+                ref=BasicAnnotationTask.Ref.hg38,
+                obs_type=BasicAnnotationTask.ObsType.bulk,
+                window_type=BasicAnnotationTask.WindowType.bin,
+                value_type=BasicAnnotationTask.ValueType.int
+            )
+            sbatch_basic_annotation_task(task_uuid)
+        elif name == 'WCDT-MCRPC':
+            input_file_path = os.path.join(demo_data_folder, 'WCDT-MCRPC.GATK4_CNV.cna.csv')
+            input_file = os.path.join(input_dir, 'cna.csv')
+            shutil.copy(input_file_path, input_file)
+            task = BasicAnnotationTask.objects.create(
+                uuid=task_uuid,
+                user=task_uuid,
+                status=BasicAnnotationTask.Status.Pending,
+                create_time=timezone.now(),
+                k=50,
+                ref=BasicAnnotationTask.Ref.hg38,
+                obs_type=BasicAnnotationTask.ObsType.bulk,
+                window_type=BasicAnnotationTask.WindowType.bin,
+                value_type=BasicAnnotationTask.ValueType.int
+            )
+            sbatch_basic_annotation_task(task_uuid)
+        elif name == 'BRCA-T10':
+            input_file_path = os.path.join(demo_data_folder, 'T10_cna.csv')
+            input_file = os.path.join(input_dir, 'cna.csv')
+            shutil.copy(input_file_path, input_file)
+            task = BasicAnnotationTask.objects.create(
+                uuid=task_uuid,
+                user=task_uuid,
+                status=BasicAnnotationTask.Status.Pending,
+                create_time=timezone.now(),
+                k=50,
+                ref=BasicAnnotationTask.Ref.hg38,
+                obs_type=BasicAnnotationTask.ObsType.single,
+                window_type=BasicAnnotationTask.WindowType.bin,
+                value_type=BasicAnnotationTask.ValueType.int
+            )
+            sbatch_basic_annotation_task(task_uuid)
+        elif name == 'LUAD':
+            cna1 = os.path.join(demo_data_folder, 'CPTAC-LUAD.ascatNGS.cna.csv')
+            cna2 = os.path.join(demo_data_folder, 'APOLLO-LUAD.ascatNGS.cna.csv')
+            input_file1 = os.path.join(input_dir, 'CPTAC-LUAD.ascatNGS.cna.csv')
+            input_file2 = os.path.join(input_dir, 'APOLLO-LUAD.ascatNGS.cna.csv')
+            shutil.copy(cna1, input_file1)
+            shutil.copy(cna2, input_file2)
+            input_file = ','.join([input_file1, input_file2])
+            task = RecurrentCNATask.objects.create(
+                uuid=task_uuid,
+                user=task_uuid,
+                create_time=timezone.now(),
+                ref=RecurrentCNATask.Ref.hg19,
+                obs_type=RecurrentCNATask.ObsType.bulk,
+            )
+            sbatch_recurrent_cna_task(task_uuid, input_file)
+        elif name == 'LUSC':
+            cna1 = os.path.join(demo_data_folder, 'TCGA-LUSC.ascatNGS.cna.csv')
+            cna2 = os.path.join(demo_data_folder, 'CPTAC-LUSC.ascatNGS.cna.csv')
+            input_file1 = os.path.join(input_dir, 'TCGA-LUSC.ascatNGS.cna.csv')
+            input_file2 = os.path.join(input_dir, 'CPTAC-LUSC.ascatNGS.cna.csv')
+            shutil.copy(cna1, input_file1)
+            shutil.copy(cna2, input_file2)
+            input_file = ','.join([input_file1, input_file2])
+            task = RecurrentCNATask.objects.create(
+                uuid=task_uuid,
+                user=task_uuid,
+                create_time=timezone.now(),
+                ref=RecurrentCNATask.Ref.hg19,
+                obs_type=RecurrentCNATask.ObsType.bulk,
+            )
+            sbatch_recurrent_cna_task(task_uuid, input_file)
+
+        elif name == 'COAD':
+            cna1 = os.path.join(demo_data_folder, 'SRP017032.Ginkgo.cna.csv')
+            cna2 = os.path.join(demo_data_folder, 'SRP093555.Ginkgo.cna.csv')
+            input_file1 = os.path.join(input_dir, 'SRP017032.Ginkgo.cna.csv')
+            input_file2 = os.path.join(input_dir, 'SRP093555.Ginkgo.cna.csv')
+            shutil.copy(cna1, input_file1)
+            shutil.copy(cna2, input_file2)
+            input_file = ','.join([input_file1, input_file2])
+            task = RecurrentCNATask.objects.create(
+                uuid=task_uuid,
+                user=task_uuid,
+                create_time=timezone.now(),
+                ref=RecurrentCNATask.Ref.hg19,
+                obs_type=RecurrentCNATask.ObsType.single,
+            )
+            sbatch_recurrent_cna_task(task_uuid, input_file)
+        
+        if name in ['TCGA-ACC', 'WCDT-MCRPC', 'BRCA-T10']:
+            # 返回成功信息
+            return Response({
+                "success": True,
+                "msg": "Task submitted successfully",
+                "data": {
+                    "uuid": str(task_uuid),
+                    "name": task.name if hasattr(task, 'name') else '',  # 检查name字段是否存在
+                    "user": task.user,
+                    "status": task.get_status_display(),  # 获取可读的状态名称
+                    "create_time": timezone.localtime(task.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    "ref": task.ref,
+                    "obs_type": task.get_obs_type_display(),  # 获取可读的观测类型
+                    "window_type": task.get_window_type_display(),  # 获取可读的窗口类型
+                    "value_type": task.get_value_type_display(),  # 获取可读的值类型
+                    "k": task.k,
+                    "input_file_name": task.get_input_file_absolute_path(),  # 固定为cna.csv
+                }
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return  Response({
+                "success": True,
+                "msg": "Task submitted successfully",
+                "data": {
+                    "uuid": str(task_uuid),
+                    "user": task.user,
+                    "status": task.get_status_display(),
+                    "create_time": timezone.localtime(task.create_time).strftime("%Y-%m-%d %H:%M:%S"),
+                    "ref": task.ref,
+                    "obs_type": task.get_obs_type_display(),
+                    "input_file_name": task.get_input_file_absolute_path(),
+                    "input_files": input_file,  # 包含所有有效CSV文件的路径
+                }
+            })
+    except Exception as e:
+        # 记录异常并返回错误信息
+        import traceback
+        print(traceback.format_exc())  # 打印详细错误信息到控制台
+        
+        return Response({
+            "success": False,
+            "msg": f"Server error: {str(e)}"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
