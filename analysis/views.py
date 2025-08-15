@@ -16,6 +16,7 @@ from .models import *
 from .serializers import *
 from .slurm_sbatch import *
 from .slurm_squeue import *
+from django.http import HttpResponse
 
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
@@ -731,3 +732,130 @@ def run_demo(request):
             "success": False,
             "msg": f"Server error: {str(e)}"
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(["GET"])
+def download_task_data(request):
+    try:
+        task_uuid = request.query_params.get('uuid', None)
+        
+        if not task_uuid:
+            return Response({'detail': 'Missing required parameter: task id.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            task = BasicAnnotationTask.objects.get(pk=task_uuid)
+            task_type = "BasicAnnotationTask"
+        except BasicAnnotationTask.DoesNotExist:
+            # 如果不是BasicAnnotationTask，尝试查找RecurrentCNATask
+            try:
+                task = RecurrentCNATask.objects.get(pk=task_uuid)
+                task_type = "RecurrentCNATask"
+            except RecurrentCNATask.DoesNotExist:
+                # 两种类型都不是，返回404
+                return Response({
+                    "success": False,
+                    "msg": f"Task with UUID {task_uuid} not found in any task type"
+                }, status=status.HTTP_404_NOT_FOUND)
+        if task.status != task.Status.Success:
+            return Response({'detail': 'The task is not completed yet.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        cna_file = task.get_input_file_absolute_path()
+        output_dir = task.get_output_dir_absolute_path()
+        meta_file = os.path.join(output_dir, f'{task_uuid}_meta_scsvas.csv')
+        newick_file = os.path.join(output_dir, f'{task_uuid}.nwk')
+        gene_matrix_file = os.path.join(output_dir, f'{task_uuid}_gene_cna.csv.gz')
+        term_matrix_file = os.path.join(output_dir, f'{task_uuid}_term_cna.csv.gz')
+        files = os.listdir(output_dir)
+
+        file_name_without_extension = task_uuid
+        for file in files:
+            if file.endswith(".ok"):
+                file_name_without_extension = os.path.splitext(file)[0]
+                break  # 只获取一个文件后退出循环
+
+        score_file = os.path.join(output_dir, f'gistic_{file_name_without_extension}', 'amp_genes.conf_95.txt')
+        amp_file = os.path.join(output_dir, f'gistic_{file_name_without_extension}', 'del_genes.conf_95.txt')
+        del_file = os.path.join(output_dir, f'gistic_{file_name_without_extension}', 'scores.gistic')
+
+        all_files = [
+            cna_file,
+            meta_file,
+            newick_file,
+            gene_matrix_file,
+            term_matrix_file,
+            score_file,
+            amp_file,
+            del_file
+        ]
+        # 过滤出存在的文件
+        existing_files = []
+        for file_path in all_files:
+            if file_path and os.path.isfile(file_path):
+                existing_files.append(file_path)
+        
+        # 如果没有文件存在，返回错误
+        if not existing_files:
+            return Response(
+                {"error": "No files found for this task."}, 
+                status=404
+            )
+        
+        # 创建临时ZIP文件
+        with tempfile.NamedTemporaryFile(suffix='.zip', delete=False) as temp_file:
+            temp_path = temp_file.name
+        
+        # 创建ZIP文件并添加存在的文件
+        try:
+            with zipfile.ZipFile(temp_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                file_names = {}  # 跟踪已添加的文件名，处理重复
+                
+                for file_path in existing_files:
+                    # 获取基本文件名
+                    base_name = os.path.basename(file_path)
+                    
+                    # 处理文件名重复
+                    if base_name in file_names.values():
+                        # 添加路径的部分哈希作为前缀
+                        import hashlib
+                        dir_name = os.path.dirname(file_path)
+                        hash_prefix = hashlib.md5(dir_name.encode()).hexdigest()[:8]
+                        unique_name = f"{hash_prefix}_{base_name}"
+                        
+                        counter = 1
+                        while unique_name in file_names.values():
+                            unique_name = f"{hash_prefix}_{base_name}_{counter}"
+                            counter += 1
+                        
+                        zipf.write(file_path, unique_name)
+                        file_names[file_path] = unique_name
+                    else:
+                        zipf.write(file_path, base_name)
+                        file_names[file_path] = base_name
+            
+            # 读取ZIP文件内容
+            with open(temp_path, 'rb') as f:
+                zip_content = f.read()
+            
+            # 创建HTTP响应
+            response = HttpResponse(zip_content, content_type='application/zip')
+            response['Content-Disposition'] = f'attachment; filename="{task_uuid}_files.zip"'
+            
+            # 删除临时文件
+            os.unlink(temp_path)
+            
+            return response
+        
+        except Exception as e:
+            # 确保清理临时文件
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+            
+            return Response(
+                {"error": f"Failed to create download file: {str(e)}"}, 
+                status=500
+            )
+    
+    except Exception as e:
+        return Response(
+            {"error": f"An error occurred: {str(e)}"}, 
+            status=500
+        )

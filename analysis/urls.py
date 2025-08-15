@@ -18,4 +18,6 @@ urlpatterns = [
     path('gene_recurrence_query/', visualization_views.GeneRecurrenceQueryView.as_view(), name='gene-recurrence-query'),
     path('ploidy_distribution/', visualization_views.PloidyDistributionView.as_view(), name='ploidy-distribution'),
     path('run_demo/', run_demo, name='run_demo'),
+    path('download_task_data/', download_task_data, name='download_task_data'),
+
 ]
