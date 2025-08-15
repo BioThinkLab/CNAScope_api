@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.http import HttpResponse
 
 from database.models import Dataset, BulkSampleMetadata
 from database.serializers.dataset_serializers import DatasetSerializer, BulkSampleMetadataSerializer
@@ -77,7 +78,8 @@ def download_dataset(request):
     try:
         file_path = os.path.join('/mnt/cbc_adam/platform/CNAScope/data/download_zips', f'{dataset_name}.zip')
         with open(file_path, 'rb') as f:
-            response = Response(f.read(), content_type='application/zip')
+            # 使用Django的HttpResponse来处理二进制数据
+            response = HttpResponse(f.read(), content_type='application/zip')
             response['Content-Disposition'] = f'attachment; filename="{dataset_name}.zip"'
             return response
     except FileNotFoundError:
