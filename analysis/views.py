@@ -619,7 +619,7 @@ def run_demo(request):
                 ref=BasicAnnotationTask.Ref.hg38,
                 obs_type=BasicAnnotationTask.ObsType.bulk,
                 window_type=BasicAnnotationTask.WindowType.bin,
-                value_type=BasicAnnotationTask.ValueType.int
+                value_type=BasicAnnotationTask.ValueType.log
             )
             sbatch_basic_annotation_task(task_uuid)
         elif name == 'BRCA-T10':
