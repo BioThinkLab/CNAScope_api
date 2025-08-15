@@ -62,7 +62,7 @@ def build_dataset_prefix(dataset, workflow):
 def get_dataset_samples_path(dataset):
     data_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.modality == 'bulkDNA':
+    if dataset.source == 'GDC Portal':
         meta_name = f'{dataset.name}.meta.csv'
 
         return os.path.join(data_dir, 'clean', meta_name)
