@@ -19,7 +19,7 @@ def sbatch_basic_annotation_task(uuid):
         task.ref,
         task.obs_type,
         task.window_type,
-        task.k,
+        str(task.k),
     ]
 
     result = subprocess.run(command, capture_output=True, text=True)
