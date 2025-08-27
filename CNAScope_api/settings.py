@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-mjfhht(@9_9#o))rf0!91d2h8dh7l^!!qaviui6!fb$ehwv@iv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -58,7 +58,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
+    '*'
 ]
 
 ROOT_URLCONF = "CNAScope_api.urls"
