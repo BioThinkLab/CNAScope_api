@@ -74,87 +74,106 @@ def get_dataset_samples_path(dataset):
         return os.path.join(data_dir, 'clean', meta_name)
 
 
-
-def get_dataset_matrix_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+def get_dataset_matrix_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'clean', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     matrix_name = f'{dataset.name}.{workflow_name}.cna.csv'
 
-    return os.path.join(data_dir, 'clean', matrix_name)
+    return os.path.join(data_dir, matrix_name)
 
 
-def get_dataset_meta_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+def get_dataset_meta_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     meta_name = f'{dataset.name}.{workflow_name}_meta_scsvas.csv'
 
-    return os.path.join(data_dir, 'out', meta_name)
+    return os.path.join(data_dir, meta_name)
 
 
-def get_dataset_tree_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+def get_dataset_tree_path(dataset, workflow, bin_size):
+    tree_cut_map = {
+        '5M': 50,
+        '200kb': 5,
+        '500kb': 15
+    }
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
-    tree_name = f'{dataset.name}.{workflow_name}_cut64.json'
+    tree_name = f'{dataset.name}.{workflow_name}_cut{tree_cut_map[bin_size]}.json'
 
-    return os.path.join(data_dir, 'out', tree_name)
+    return os.path.join(data_dir, tree_name)
 
 
-def get_dataset_gene_matrix_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+def get_dataset_gene_matrix_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     gene_matrix_name = f'{dataset.name}.{workflow_name}_gene_cna.parquet'
 
-    return os.path.join(data_dir, 'out', gene_matrix_name)
+    return os.path.join(data_dir, gene_matrix_name)
 
-def get_dataset_gene_matrix_csv_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+
+def get_dataset_gene_matrix_csv_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     gene_matrix_name = f'{dataset.name}.{workflow_name}_gene_cna.csv.gz'
 
-    return os.path.join(data_dir, 'out', gene_matrix_name)
+    return os.path.join(data_dir, gene_matrix_name)
 
-def get_dataset_newick_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+
+def get_dataset_newick_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     newick_name = f'{dataset.name}.{workflow_name}.nwk'
 
-    return os.path.join(data_dir, 'out', newick_name)
+    return os.path.join(data_dir, newick_name)
 
 
-def get_dataset_term_matrix_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+def get_dataset_term_matrix_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     term_matrix_name = f'{dataset.name}.{workflow_name}_term_cna.parquet'
 
-    return os.path.join(data_dir, 'out', term_matrix_name)
+    return os.path.join(data_dir, term_matrix_name)
 
-def get_dataset_term_matrix_csv_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+
+def get_dataset_term_matrix_csv_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     term_matrix_name = f'{dataset.name}.{workflow_name}_term_cna.csv.gz'
 
-    return os.path.join(data_dir, 'out', term_matrix_name)
+    return os.path.join(data_dir, term_matrix_name)
 
-def get_dataset_recurrent_scores_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+
+def get_dataset_recurrent_scores_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     folder_name = f'gistic_{dataset.name}.{workflow_name}'
 
-    return os.path.join(data_dir, 'out', folder_name, 'scores.gistic')
+    return os.path.join(data_dir, folder_name, 'scores.gistic')
 
 
-def get_dataset_recurrent_gene_path(dataset, workflow, recurrent_type):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+def get_dataset_recurrent_gene_path(dataset, workflow, recurrent_type, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     folder_name = f'gistic_{dataset.name}.{workflow_name}'
     file_name = f'{recurrent_type}_genes.conf_95.txt'
 
-    return os.path.join(data_dir, 'out', folder_name, file_name)
+    return os.path.join(data_dir, folder_name, file_name)
 
 
-def get_dataset_recurrent_json_path(dataset, workflow):
-    data_dir = str(build_dataset_data_dir_path(dataset))
+def get_dataset_recurrent_json_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+    data_dir = os.path.join(data_base_dir, 'out', bin_size)
     workflow_name = workflow_map.get(workflow, workflow)
     file_name = f'{dataset.name}.{workflow_name}_recurrent.json'
 
-    return os.path.join(data_dir, 'out', file_name)
+    return os.path.join(data_dir, file_name)

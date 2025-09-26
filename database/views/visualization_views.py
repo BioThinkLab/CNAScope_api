@@ -20,8 +20,9 @@ class CNAMatrixView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
         workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type:
+        if not dataset_name or not workflow_type or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -29,7 +30,7 @@ class CNAMatrixView(APIView):
         except Dataset.DoesNotExist:
             return Response({'detail': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        matrix_path = path_utils.get_dataset_matrix_path(dataset, workflow_type)
+        matrix_path = path_utils.get_dataset_matrix_path(dataset, workflow_type, bin_size)
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="matrix.csv"'
@@ -58,8 +59,9 @@ class CNAMetaView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
         workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type:
+        if not dataset_name or not workflow_type or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -67,7 +69,7 @@ class CNAMetaView(APIView):
         except Dataset.DoesNotExist:
             return Response({'detail': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        meta_path = path_utils.get_dataset_meta_path(dataset, workflow_type)
+        meta_path = path_utils.get_dataset_meta_path(dataset, workflow_type, bin_size)
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="meta.csv"'
@@ -96,8 +98,9 @@ class CNATreeView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
         workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type:
+        if not dataset_name or not workflow_type or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -105,7 +108,7 @@ class CNATreeView(APIView):
         except Dataset.DoesNotExist:
             return Response({'detail': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        tree_path = path_utils.get_dataset_tree_path(dataset, workflow_type)
+        tree_path = path_utils.get_dataset_tree_path(dataset, workflow_type, bin_size)
 
         try:
             with open(tree_path, 'r') as file:
@@ -120,8 +123,9 @@ class CNAGeneListView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
         workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type:
+        if not dataset_name or not workflow_type or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -129,7 +133,7 @@ class CNAGeneListView(APIView):
         except Dataset.DoesNotExist:
             return Response({'detail': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        gene_matrix_path = path_utils.get_dataset_gene_matrix_path(dataset, workflow_type)
+        gene_matrix_path = path_utils.get_dataset_gene_matrix_path(dataset, workflow_type, bin_size)
 
         try:
             header = pq.read_schema(gene_matrix_path).names[1:]
@@ -145,8 +149,9 @@ class CNANewickView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
         workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type:
+        if not dataset_name or not workflow_type or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -154,7 +159,7 @@ class CNANewickView(APIView):
         except Dataset.DoesNotExist:
             return Response({'detail': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        newick_path = path_utils.get_dataset_newick_path(dataset, workflow_type)
+        newick_path = path_utils.get_dataset_newick_path(dataset, workflow_type, bin_size)
 
         try:
             with open(newick_path, 'r') as file:
@@ -170,6 +175,7 @@ class CNAGeneMatrixView(APIView):
         dataset_name = request.data.get('datasetName')
         workflow_type = request.data.get('workflowType')
         genes = request.data.get('genes')
+        bin_size = request.query_params.get('bin_size', None)
 
         # 基本参数校验
         if not dataset_name:
@@ -178,13 +184,15 @@ class CNAGeneMatrixView(APIView):
             return Response({'error': 'workflowType is required'}, status=status.HTTP_400_BAD_REQUEST)
         if not isinstance(genes, list):
             return Response({'error': 'genes must be a list'}, status=status.HTTP_400_BAD_REQUEST)
+        if not bin_size:
+            return Response({'error': 'binSize is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             dataset = Dataset.objects.get(name=dataset_name)
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        gene_matrix_path = path_utils.get_dataset_gene_matrix_path(dataset, workflow_type)
+        gene_matrix_path = path_utils.get_dataset_gene_matrix_path(dataset, workflow_type, bin_size)
 
         try:
             # 提取 Gene 的 CNA 矩阵
@@ -212,8 +220,9 @@ class CNATermListView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
         workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type:
+        if not dataset_name or not workflow_type or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -221,7 +230,7 @@ class CNATermListView(APIView):
         except Dataset.DoesNotExist:
             return Response({'detail': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        term_matrix_path = path_utils.get_dataset_term_matrix_path(dataset, workflow_type)
+        term_matrix_path = path_utils.get_dataset_term_matrix_path(dataset, workflow_type, bin_size)
 
         try:
             header = pq.read_schema(term_matrix_path).names[1:]
@@ -238,8 +247,9 @@ class CNATermMatrixView(APIView):
         dataset_name = request.data.get('datasetName', None)
         workflow_type = request.data.get('workflowType', None)
         terms = request.data.get('terms', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type or not terms:
+        if not dataset_name or not workflow_type or not terms or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not isinstance(terms, list):
@@ -250,7 +260,7 @@ class CNATermMatrixView(APIView):
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        term_matrix_path = path_utils.get_dataset_term_matrix_path(dataset, workflow_type)
+        term_matrix_path = path_utils.get_dataset_term_matrix_path(dataset, workflow_type, bin_size)
 
         try:
             # 提取 Term 的 CNA 矩阵
@@ -277,8 +287,9 @@ class FocalCNAInfoView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
         workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type:
+        if not dataset_name or not workflow_type or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -286,9 +297,9 @@ class FocalCNAInfoView(APIView):
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, workflow_type, 'amp')
-        del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, workflow_type, 'del')
-        scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, workflow_type)
+        amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, workflow_type, 'amp', bin_size)
+        del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, workflow_type, 'del', bin_size)
+        scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, workflow_type, bin_size)
 
         amp_regions_info = recurrent_utils.parse_recurrent_regions(amp_gene_path)
         del_regions_info = recurrent_utils.parse_recurrent_regions(del_gene_path)
@@ -310,8 +321,9 @@ class GeneRecurrenceQueryView(APIView):
         workflow_type = request.query_params.get('workflow_type', None)
         page = request.query_params.get('page', None)
         page_size = request.query_params.get('page_size', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type or not page or not page_size:
+        if not dataset_name or not workflow_type or not page or not page_size or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -325,7 +337,7 @@ class GeneRecurrenceQueryView(APIView):
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        recurrence_file_path = path_utils.get_dataset_recurrent_json_path(dataset, workflow_type)
+        recurrence_file_path = path_utils.get_dataset_recurrent_json_path(dataset, workflow_type, bin_size)
 
         try:
             with open(recurrence_file_path, 'r') as f:
@@ -366,8 +378,9 @@ class PloidyDistributionView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
         workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type:
+        if not dataset_name or not workflow_type or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -375,7 +388,7 @@ class PloidyDistributionView(APIView):
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        matrix_path = path_utils.get_dataset_matrix_path(dataset, workflow_type)
+        matrix_path = path_utils.get_dataset_matrix_path(dataset, workflow_type, bin_size)
 
         try:
             bin_abundance_list = matrix_utils.calculate_abundance(matrix_path)
