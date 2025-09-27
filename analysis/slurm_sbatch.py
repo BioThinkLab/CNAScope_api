@@ -20,6 +20,7 @@ def sbatch_basic_annotation_task(uuid):
         task.obs_type,
         task.window_type,
         str(task.k),
+        str(task.email),
     ]
 
     result = subprocess.run(command, capture_output=True, text=True)
@@ -43,6 +44,7 @@ def sbatch_recurrent_cna_task(uuid, input_files):
         input_files,
         task.ref,
         task.obs_type,
+        str(task.email),
     ]
 
     result = subprocess.run(command, capture_output=True, text=True)

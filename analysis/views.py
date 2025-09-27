@@ -100,7 +100,8 @@ def submit_basic_annotation_task(request):
                 ref=request.data.get('ref', BasicAnnotationTask.Ref.hg38),
                 obs_type=request.data.get('obs_type', BasicAnnotationTask.ObsType.bulk),
                 window_type=request.data.get('window_type', BasicAnnotationTask.WindowType.bin),
-                value_type=request.data.get('value_type', BasicAnnotationTask.ValueType.int)
+                value_type=request.data.get('value_type', BasicAnnotationTask.ValueType.int),
+                email = request.data.get('email', ''),
             )
             input_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'input')
             output_dir = os.path.join(settings.WORKSPACE_HOME, str(task_uuid), 'output')
@@ -374,6 +375,7 @@ def submit_recurrent_cna_task(request):
                 create_time=timezone.now(),
                 ref=request.data.get('ref', RecurrentCNATask.Ref.hg38),
                 obs_type=request.data.get('obs_type', RecurrentCNATask.ObsType.bulk),
+                email = request.data.get('email', '')
             )
             
             # 启动异步任务处理 (如果需要)

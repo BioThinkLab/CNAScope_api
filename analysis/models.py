@@ -40,6 +40,7 @@ class BasicAnnotationTask(models.Model):
     obs_type = models.CharField(choices=ObsType.choices, default=ObsType.bulk)
     window_type = models.CharField(choices=WindowType.choices, default=WindowType.bin)
     value_type = models.CharField(choices=ValueType.choices, default=ValueType.int)
+    email = models.EmailField(max_length=254, blank=True, null=True)
 
 class RecurrentCNATask(models.Model):
     class Status(models.TextChoices):
@@ -73,4 +74,5 @@ class RecurrentCNATask(models.Model):
     ref = models.CharField(choices=Ref.choices, default=Ref.hg38)
     obs_type = models.CharField(choices=ObsType.choices, default=ObsType.bulk)
     value_type = models.CharField(choices=ValueType.choices, default=ValueType.int)
+    email = models.EmailField(max_length=254, blank=True, null=True)
     # input_file = models.FileField(upload_to=get_input_file_path, null=True, blank=True)

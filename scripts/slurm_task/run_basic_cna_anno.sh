@@ -7,7 +7,7 @@
 
 # 检查参数数量
 if [ $# -lt 6 ]; then
-    echo "Error: Missing arguments. Usage: sbatch $0 <uuid> <input_csv> <ref> <obs_type> <window_type> <k>"
+    echo "Error: Missing arguments. Usage: sbatch $0 <uuid> <input_csv> <ref> <obs_type> <window_type> <k> <email>"
     exit 1
 fi
 
@@ -18,6 +18,7 @@ ref=$3
 obs_type=$4
 window_type=$5
 k=$6
+email=$7
 
 # 名称直接使用UUID
 name="${uuid}"
@@ -25,6 +26,7 @@ name="${uuid}"
 # 设置工作目录和脚本目录
 script_dir="/home/platform/workspace/CNAScope/scSVAS"  # 根据实际情况调整
 output_dir="/home/platform/workspace/CNAScope/CNAScope_api/workspace/${uuid}/output"   # 根据实际情况调整
+email_script="/home/platform/workspace/CNAScope/CNAScope_api/scripts/slurm_task/send_email.sh"  # 根据实际情况调整
 
 # 确保输出目录存在
 mkdir -p "${output_dir}"
@@ -72,9 +74,11 @@ status_file="${output_dir}/status.txt"
 
 if [ $script_exit_code -ne 0 ]; then
     status="fail"
+    bash "${email_script}" "${email}" "CNAScope Task Notification" "Your CNAScope task with UUID ${uuid} has failed. Please check the logs for details."
     echo "Job failed at ${finished_time}"
 else
     status="success"
+    bash "${email_script}" "${email}" "CNAScope Task Notification" "Your CNAScope task with UUID ${uuid} has completed successfully."
     echo "Job completed successfully at ${finished_time}"
 fi
 
