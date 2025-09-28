@@ -161,6 +161,8 @@ class CNANewickView(APIView):
 
         newick_path = path_utils.get_dataset_newick_path(dataset, workflow_type, bin_size)
 
+        print(newick_path)
+
         try:
             with open(newick_path, 'r') as file:
                 content = file.read()
