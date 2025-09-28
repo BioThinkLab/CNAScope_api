@@ -77,7 +77,7 @@ def get_dataset_samples_path(dataset):
 def get_dataset_matrix_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'clean', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'clean')
@@ -91,7 +91,7 @@ def get_dataset_matrix_path(dataset, workflow, bin_size):
 def get_dataset_meta_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
@@ -110,7 +110,7 @@ def get_dataset_tree_path(dataset, workflow, bin_size):
     }
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
         cut_suffix = f'cut{tree_cut_map[bin_size]}'
     else:
@@ -126,7 +126,7 @@ def get_dataset_tree_path(dataset, workflow, bin_size):
 def get_dataset_gene_matrix_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
@@ -140,7 +140,7 @@ def get_dataset_gene_matrix_path(dataset, workflow, bin_size):
 def get_dataset_gene_matrix_csv_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
@@ -154,7 +154,7 @@ def get_dataset_gene_matrix_csv_path(dataset, workflow, bin_size):
 def get_dataset_newick_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
@@ -168,7 +168,7 @@ def get_dataset_newick_path(dataset, workflow, bin_size):
 def get_dataset_term_matrix_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
@@ -182,7 +182,7 @@ def get_dataset_term_matrix_path(dataset, workflow, bin_size):
 def get_dataset_term_matrix_csv_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
@@ -196,7 +196,7 @@ def get_dataset_term_matrix_csv_path(dataset, workflow, bin_size):
 def get_dataset_recurrent_scores_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
@@ -210,7 +210,7 @@ def get_dataset_recurrent_scores_path(dataset, workflow, bin_size):
 def get_dataset_recurrent_gene_path(dataset, workflow, recurrent_type, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
@@ -225,7 +225,7 @@ def get_dataset_recurrent_gene_path(dataset, workflow, recurrent_type, bin_size)
 def get_dataset_recurrent_json_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal':
+    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'out')
