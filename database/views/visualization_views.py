@@ -172,10 +172,10 @@ class CNANewickView(APIView):
 
 class CNAGeneMatrixView(APIView):
     def post(self, request):
-        dataset_name = request.data.get('datasetName')
-        workflow_type = request.data.get('workflowType')
-        genes = request.data.get('genes')
-        bin_size = request.query_params.get('bin_size', None)
+        dataset_name = request.data.get('datasetName', None)
+        workflow_type = request.data.get('workflowType', None)
+        genes = request.data.get('genes', None)
+        bin_size = request.data.get('binSize', None)
 
         # 基本参数校验
         if not dataset_name:
@@ -247,7 +247,7 @@ class CNATermMatrixView(APIView):
         dataset_name = request.data.get('datasetName', None)
         workflow_type = request.data.get('workflowType', None)
         terms = request.data.get('terms', None)
-        bin_size = request.query_params.get('bin_size', None)
+        bin_size = request.data.get('binSize', None)
 
         if not dataset_name or not workflow_type or not terms or not bin_size:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)

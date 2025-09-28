@@ -76,7 +76,12 @@ def get_dataset_samples_path(dataset):
 
 def get_dataset_matrix_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'clean', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'clean', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'clean')
+
     workflow_name = workflow_map.get(workflow, workflow)
     matrix_name = f'{dataset.name}.{workflow_name}.cna.csv'
 
@@ -85,7 +90,12 @@ def get_dataset_matrix_path(dataset, workflow, bin_size):
 
 def get_dataset_meta_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     meta_name = f'{dataset.name}.{workflow_name}_meta_scsvas.csv'
 
@@ -99,16 +109,28 @@ def get_dataset_tree_path(dataset, workflow, bin_size):
         '500kb': 15
     }
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+        cut_suffix = f'cut{tree_cut_map[bin_size]}'
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+        cut_suffix = f'cut64'
+
     workflow_name = workflow_map.get(workflow, workflow)
-    tree_name = f'{dataset.name}.{workflow_name}_cut{tree_cut_map[bin_size]}.json'
+    tree_name = f'{dataset.name}.{workflow_name}_{cut_suffix}.json'
 
     return os.path.join(data_dir, tree_name)
 
 
 def get_dataset_gene_matrix_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     gene_matrix_name = f'{dataset.name}.{workflow_name}_gene_cna.parquet'
 
@@ -117,7 +139,12 @@ def get_dataset_gene_matrix_path(dataset, workflow, bin_size):
 
 def get_dataset_gene_matrix_csv_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     gene_matrix_name = f'{dataset.name}.{workflow_name}_gene_cna.csv.gz'
 
@@ -126,7 +153,12 @@ def get_dataset_gene_matrix_csv_path(dataset, workflow, bin_size):
 
 def get_dataset_newick_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     newick_name = f'{dataset.name}.{workflow_name}.nwk'
 
@@ -135,7 +167,12 @@ def get_dataset_newick_path(dataset, workflow, bin_size):
 
 def get_dataset_term_matrix_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     term_matrix_name = f'{dataset.name}.{workflow_name}_term_cna.parquet'
 
@@ -144,7 +181,12 @@ def get_dataset_term_matrix_path(dataset, workflow, bin_size):
 
 def get_dataset_term_matrix_csv_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     term_matrix_name = f'{dataset.name}.{workflow_name}_term_cna.csv.gz'
 
@@ -153,7 +195,12 @@ def get_dataset_term_matrix_csv_path(dataset, workflow, bin_size):
 
 def get_dataset_recurrent_scores_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     folder_name = f'gistic_{dataset.name}.{workflow_name}'
 
@@ -162,7 +209,12 @@ def get_dataset_recurrent_scores_path(dataset, workflow, bin_size):
 
 def get_dataset_recurrent_gene_path(dataset, workflow, recurrent_type, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     folder_name = f'gistic_{dataset.name}.{workflow_name}'
     file_name = f'{recurrent_type}_genes.conf_95.txt'
@@ -172,7 +224,12 @@ def get_dataset_recurrent_gene_path(dataset, workflow, recurrent_type, bin_size)
 
 def get_dataset_recurrent_json_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
-    data_dir = os.path.join(data_base_dir, 'out', bin_size)
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
     workflow_name = workflow_map.get(workflow, workflow)
     file_name = f'{dataset.name}.{workflow_name}_recurrent.json'
 
