@@ -20,6 +20,21 @@ def extract_matrix_from_parquet(file_path, target_column):
     return df
 
 
+def extract_matrix_from_csv(file_path, target_column):
+    # 先读取 CSV 文件的头部（schema）
+    df = pd.read_csv(file_path, nrows=1)
+    all_columns = df.columns.tolist()
+    first_col = all_columns[0]
+
+    # 构造需要的列：第一列 + 用户指定的存在的列
+    selected_cols = [first_col] + [c for c in target_column if c in all_columns and c != first_col]
+
+    # 只读取需要的列（高效）
+    df = pd.read_csv(file_path, usecols=selected_cols, index_col=0)
+
+    return df
+
+
 def calculate_abundance(file_path):
     try:
         df = pd.read_csv(file_path)

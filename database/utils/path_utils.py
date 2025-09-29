@@ -234,3 +234,17 @@ def get_dataset_recurrent_json_path(dataset, workflow, bin_size):
     file_name = f'{dataset.name}.{workflow_name}_recurrent.json'
 
     return os.path.join(data_dir, file_name)
+
+
+def get_dataset_top_cn_variance_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
+    workflow_name = workflow_map.get(workflow, workflow)
+    file_name = f'{dataset.name}.{workflow_name}_top_CN_variance.csv'
+
+    return os.path.join(data_dir, file_name)

@@ -397,3 +397,82 @@ class PloidyDistributionView(APIView):
 
         return Response(bin_abundance_list)
 
+
+class TopCNVarianceView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+        workflow_type = request.query_params.get('workflow_type', None)
+        bin_size = request.query_params.get('bin_size', None)
+
+        if not dataset_name or not workflow_type or not bin_size:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            dataset = Dataset.objects.get(name=dataset_name)
+        except Dataset.DoesNotExist:
+            return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        matrix_path = path_utils.get_dataset_top_cn_variance_path(dataset, workflow_type, bin_size)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="matrix.csv"'
+
+        try:
+            with open(matrix_path, 'r', newline='') as file:
+                reader = csv.reader(file)
+                writer = csv.writer(response)
+
+                # 读取第一行（列名）
+                header = next(reader)
+                # 将第一列名称更改为 'id'
+                header[0] = 'id'
+                writer.writerow(header)  # 写入新的列名
+
+                # 逐行写入数据
+                for row in reader:
+                    writer.writerow(row)
+        except FileNotFoundError:
+            return Response('CNA matrix file not found!', status=status.HTTP_404_NOT_FOUND)
+
+        return response
+
+
+class CNAVectorView(APIView):
+    def post(self, request):
+        dataset_name = request.data.get('datasetName', None)
+        workflow_type = request.data.get('workflowType', None)
+        bins = request.data.get('bins', None)
+        bin_size = request.data.get('binSize', None)
+
+        if not dataset_name or not workflow_type or not bins or not bin_size:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not isinstance(bins, list):
+            return Response({'error': 'bins must be a list'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            dataset = Dataset.objects.get(name=dataset_name)
+        except Dataset.DoesNotExist:
+            return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        bin_matrix_path = path_utils.get_dataset_matrix_path(dataset, workflow_type, bin_size)
+
+        try:
+            # 提取 Term 的 CNA 矩阵
+            df = matrix_utils.extract_matrix_from_csv(bin_matrix_path, bins)
+
+            # 重命名索引为 'id'
+            df.index.name = 'id'
+
+            # 转成 CSV 字符串
+            csv_str = df.to_csv()
+
+            # 返回 CSV
+            resp = HttpResponse(csv_str, content_type='text/csv; charset=utf-8')
+            resp['Content-Disposition'] = 'inline; filename="subset.csv"'
+
+            return resp
+        except FileNotFoundError:
+            return Response({'error': 'Term matrix file not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
