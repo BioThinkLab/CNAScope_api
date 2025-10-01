@@ -1,6 +1,6 @@
 import os
 
-from CNAScope_api.constant import DATA_HOME
+from CNAScope_api.constant import DATA_HOME, GISTIC_HOME
 
 
 source_map = {
@@ -46,6 +46,12 @@ workflow_map = {
     'SNP-FASST2': 'SNP-FASST2',
     'tCoNut': 'tCoNut',
     'NA': 'nan'
+}
+
+cn_type_map = {
+    'allele': 'allele-specific',
+    'cns': 'copy-number-segment',
+    'mcns': 'masked-copy-number-segment'
 }
 
 
@@ -193,13 +199,9 @@ def get_dataset_term_matrix_csv_path(dataset, workflow, bin_size):
     return os.path.join(data_dir, term_matrix_name)
 
 
-def get_dataset_recurrent_scores_path(dataset, workflow, bin_size):
-    data_base_dir = str(build_dataset_data_dir_path(dataset))
-
-    if dataset.source == 'GDC Portal':
-        data_dir = os.path.join(data_base_dir, 'out', bin_size)
-    else:
-        data_dir = os.path.join(data_base_dir, 'out')
+def get_dataset_recurrent_scores_path(dataset, cn_type, workflow):
+    cn_type_folder_name = cn_type_map.get(cn_type, cn_type)
+    data_dir = os.path.join(str(GISTIC_HOME), cn_type_folder_name)
 
     workflow_name = workflow_map.get(workflow, workflow)
     folder_name = f'gistic_{dataset.name}.{workflow_name}'
@@ -207,13 +209,9 @@ def get_dataset_recurrent_scores_path(dataset, workflow, bin_size):
     return os.path.join(data_dir, folder_name, 'scores.gistic')
 
 
-def get_dataset_recurrent_gene_path(dataset, workflow, recurrent_type, bin_size):
-    data_base_dir = str(build_dataset_data_dir_path(dataset))
-
-    if dataset.source == 'GDC Portal':
-        data_dir = os.path.join(data_base_dir, 'out', bin_size)
-    else:
-        data_dir = os.path.join(data_base_dir, 'out')
+def get_dataset_recurrent_gene_path(dataset, cn_type, workflow, recurrent_type):
+    cn_type_folder_name = cn_type_map.get(cn_type, cn_type)
+    data_dir = os.path.join(str(GISTIC_HOME), cn_type_folder_name)
 
     workflow_name = workflow_map.get(workflow, workflow)
     folder_name = f'gistic_{dataset.name}.{workflow_name}'
@@ -246,5 +244,12 @@ def get_dataset_top_cn_variance_path(dataset, workflow, bin_size):
 
     workflow_name = workflow_map.get(workflow, workflow)
     file_name = f'{dataset.name}.{workflow_name}_top_CN_variance.csv'
+
+    return os.path.join(data_dir, file_name)
+
+
+def get_consensus_focal_gene_json_path(dataset_name):
+    data_dir = os.path.join(GISTIC_HOME, 'consensus')
+    file_name = f'{dataset_name}_focal_gene.json'
 
     return os.path.join(data_dir, file_name)

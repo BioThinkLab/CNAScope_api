@@ -283,13 +283,25 @@ class CNATermMatrixView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class FocalCNAOptionsView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+
+        if not dataset_name:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = recurrent_utils.get_gistic_options(dataset_name)
+
+        return Response(result)
+
+
 class FocalCNAInfoView(APIView):
     def get(self, request):
         dataset_name = request.query_params.get('dataset_name', None)
+        cn_type = request.query_params.get('cn_type', None)
         workflow_type = request.query_params.get('workflow_type', None)
-        bin_size = request.query_params.get('bin_size', None)
 
-        if not dataset_name or not workflow_type or not bin_size:
+        if not dataset_name or not workflow_type or not cn_type:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -297,9 +309,9 @@ class FocalCNAInfoView(APIView):
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, workflow_type, 'amp', bin_size)
-        del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, workflow_type, 'del', bin_size)
-        scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, workflow_type, bin_size)
+        amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow_type, 'amp')
+        del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow_type, 'del')
+        scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, workflow_type)
 
         amp_regions_info = recurrent_utils.parse_recurrent_regions(amp_gene_path)
         del_regions_info = recurrent_utils.parse_recurrent_regions(del_gene_path)
@@ -476,3 +488,21 @@ class CNAVectorView(APIView):
             return Response({'error': 'Term matrix file not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CNAConsensusVennView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+
+        if not dataset_name:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        focal_gene_json_path = path_utils.get_consensus_focal_gene_json_path(dataset_name)
+
+        try:
+            with open(focal_gene_json_path, 'r') as f:
+                focal_gene_data = json.load(f)
+
+                return Response(focal_gene_data)
+        except FileNotFoundError:
+            return Response('Consensus Focal Gene file not found!', status=status.HTTP_404_NOT_FOUND)

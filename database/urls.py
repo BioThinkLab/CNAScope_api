@@ -19,10 +19,12 @@ urlpatterns = [
     path('CNA_gene_matrix/', visualization_views.CNAGeneMatrixView.as_view(), name='CNA-gene-matrix'),
     path('CNA_terms/', visualization_views.CNATermListView.as_view(), name='CNA-term-list'),
     path('CNA_term_matrix/', visualization_views.CNATermMatrixView.as_view(), name='CNA-term-matrix'),
+    path('focal_CNA_options/', visualization_views.FocalCNAOptionsView.as_view(), name='CNA-options'),
     path('focal_CNA_info/', visualization_views.FocalCNAInfoView.as_view(), name='focal-CNA-info'),
     path('gene_recurrence_query/', visualization_views.GeneRecurrenceQueryView.as_view(), name='gene-recurrence-query'),
     path('ploidy_distribution/', visualization_views.PloidyDistributionView.as_view(), name='ploidy-distribution'),
     path('download_dataset/', dataset_views.download_dataset, name='download_dataset'),
     path('top_cn_variance/', visualization_views.TopCNVarianceView.as_view(), name='top-cn-variance'),
     path('CNA_vector/', visualization_views.CNAVectorView.as_view(), name='CNA-vector'),
+    path('consensus_focal_gene/', visualization_views.CNAConsensusVennView.as_view(), name='consensus-focal-gene'),
 ]
