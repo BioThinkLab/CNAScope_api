@@ -27,4 +27,9 @@ urlpatterns = [
     path('top_cn_variance/', visualization_views.TopCNVarianceView.as_view(), name='top-cn-variance'),
     path('CNA_vector/', visualization_views.CNAVectorView.as_view(), name='CNA-vector'),
     path('consensus_focal_gene/', visualization_views.CNAConsensusVennView.as_view(), name='consensus-focal-gene'),
+    path('consensus_gene/', visualization_views.CNAConsensusGeneView.as_view(), name='consensus-gene'),
+    path('consensus_gene_download/', visualization_views.CNAConsensusGeneDownloadView.as_view(),
+         name='consensus-gene-download'),
+    path('pathway_enrichment_options/', visualization_views.PathwayEnrichmentPlotOptionsView.as_view(), name='pathway-enrichment-options'),
+    path('pathway_enrichment_plot/', visualization_views.PathwayEnrichmentPlotView.as_view(), name='pathway-enrichment-plot'),
 ]

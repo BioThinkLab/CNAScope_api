@@ -5,7 +5,7 @@ import json
 import pyarrow.parquet as pq
 import pandas as pd
 
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -506,3 +506,92 @@ class CNAConsensusVennView(APIView):
                 return Response(focal_gene_data)
         except FileNotFoundError:
             return Response('Consensus Focal Gene file not found!', status=status.HTTP_404_NOT_FOUND)
+
+
+class CNAConsensusGeneView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+
+        if not dataset_name:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        consensus_gene_csv_path = path_utils.get_consensus_gene_csv_path(dataset_name)
+
+        try:
+            consensus_gene_df = pd.read_csv(consensus_gene_csv_path)
+
+            # 准备转换后的数据存储
+            converted_data = []
+
+            # 遍历每一行数据并构建字典
+            for _, row in consensus_gene_df.iterrows():
+                data = {
+                    "type": row["CNA_Type"],
+                    "modality_workflow": row["Modality_Workflow"],
+                    "n_modality_workflow": row["n_Modality_Workflow"],
+                    "consensus_gene": row["consensus_gene"],
+                    "n_consensus": row["n_consensus"]
+                }
+
+                # 将构建好的字典添加到结果列表
+                converted_data.append(data)
+
+            return Response(converted_data)
+        except FileNotFoundError:
+            return Response('Consensus Gene file not found!', status=status.HTTP_404_NOT_FOUND)
+
+
+class CNAConsensusGeneDownloadView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+
+        if not dataset_name:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        consensus_gene_csv_path = path_utils.get_consensus_gene_csv_path(dataset_name)
+
+        # 检查文件是否存在
+        if not os.path.exists(consensus_gene_csv_path):
+            return Response({'detail': 'File not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 读取文件并返回响应，作为文件下载
+        try:
+            response = FileResponse(open(consensus_gene_csv_path, 'rb'), as_attachment=True,
+                                    filename=f"{dataset_name}_consensus_genes.csv")
+            return response
+        except Exception as e:
+            return Response({'detail': f'Error reading file: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PathwayEnrichmentPlotOptionsView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+
+        if not dataset_name:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        result = recurrent_utils.get_ora_options(dataset_name)
+
+        return Response(result)
+
+
+class PathwayEnrichmentPlotView(APIView):
+    def get(self, request):
+        dataset_name = request.query_params.get('dataset_name', None)
+        cn_type = request.query_params.get('cn_type', None)
+        workflow = request.query_params.get('workflow', None)
+
+        if not dataset_name or not cn_type and not workflow:
+            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        ora_csv_path = path_utils.get_ora_csv_path(dataset_name, cn_type, workflow)
+
+        try:
+            ora_df = pd.read_csv(ora_csv_path)
+            filtered_df = ora_df[ora_df["Adjusted P-value"] < 0.05]
+            records = filtered_df.to_dict(orient="records")
+
+            return Response(records)
+        except FileNotFoundError:
+            return Response('Pathway Enrichment file not found!', status=status.HTTP_404_NOT_FOUND)
+

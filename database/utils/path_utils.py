@@ -54,6 +54,14 @@ cn_type_map = {
     'mcns': 'masked-copy-number-segment'
 }
 
+ora_workflow_map = {
+    'Ascat2': 'ascat2',
+    'Ascat3': 'ascat3',
+    'AscatNGS': 'ascatNGS',
+    'GATK4 CNV': 'GATK4_CNV',
+    'DNAcopy': 'DNAcopy'
+}
+
 
 def build_dataset_data_dir_path(dataset):
     return os.path.join(DATA_HOME, dataset.modality, source_map[dataset.source])
@@ -253,3 +261,19 @@ def get_consensus_focal_gene_json_path(dataset_name):
     file_name = f'{dataset_name}_focal_gene.json'
 
     return os.path.join(data_dir, file_name)
+
+
+def get_consensus_gene_csv_path(dataset_name):
+    data_dir = os.path.join(GISTIC_HOME, 'consensus')
+    file_name = f'{dataset_name}_consensus_gene.csv'
+
+    return os.path.join(data_dir, file_name)
+
+
+def get_ora_csv_path(dataset_name, cn_type, workflow):
+    if cn_type == 'consensus' and workflow == 'consensus':
+        return os.path.join(GISTIC_HOME, 'consensus', f'{dataset_name}_consensus_term.csv')
+
+    folder_name = f'gistic_{dataset_name}.{ora_workflow_map[workflow]}'
+
+    return os.path.join(GISTIC_HOME, cn_type_map[cn_type], folder_name, 'ora', 'ora_results.csv')

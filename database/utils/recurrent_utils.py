@@ -121,3 +121,53 @@ def get_gistic_options(dataset_name):
     result = {key: value for key, value in result.items() if value}
 
     return result
+
+
+def has_ora(directory):
+    return os.path.exists(os.path.join(directory, 'ora', 'ora_results.csv'))
+
+
+def process_ora_category(category, sub_category, dataset_name, result):
+    if dataset_name in sub_category:
+        sub_category_path = os.path.join(GISTIC_HOME, category, sub_category)
+
+        if os.path.isdir(sub_category_path) and has_ora(sub_category_path):
+            workflow = workflow_map[extract_workflow(sub_category)]
+
+            if category == 'allele-specific':
+                result['allele'].append(workflow)
+            elif category == 'copy-number-segment':
+                result['cns'].append(workflow)
+            elif category == 'masked-copy-number-segment':
+                result['mcns'].append(workflow)
+
+
+def get_ora_options(dataset_name):
+    result = {
+        'allele': [],
+        'cns': [],
+        'mcns': []
+    }
+
+    categories = os.listdir(GISTIC_HOME)
+
+    for category in categories:
+        category_path = os.path.join(GISTIC_HOME, category)
+
+        if category == 'consensus':
+            continue
+
+        if os.path.isdir(category_path):
+            sub_categories = os.listdir(category_path)
+
+            for sub_category in sub_categories:
+                process_category(category, sub_category, dataset_name, result)
+
+    result = {key: value for key, value in result.items() if value}
+
+    consensus_ora_name = f'{dataset_name}_consensus_term.csv'
+
+    if os.path.exists(os.path.join(GISTIC_HOME, 'consensus', consensus_ora_name)):
+        result['consensus'] = ['consensus']
+
+    return result
