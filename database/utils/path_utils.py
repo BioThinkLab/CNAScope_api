@@ -211,7 +211,7 @@ def get_dataset_recurrent_scores_path(dataset, cn_type, workflow):
     cn_type_folder_name = cn_type_map.get(cn_type, cn_type)
     data_dir = os.path.join(str(GISTIC_HOME), cn_type_folder_name)
 
-    workflow_name = workflow_map.get(workflow, workflow)
+    workflow_name = ora_workflow_map.get(workflow, workflow)
     folder_name = f'gistic_{dataset.name}.{workflow_name}'
 
     return os.path.join(data_dir, folder_name, 'scores.gistic')
@@ -221,7 +221,7 @@ def get_dataset_recurrent_gene_path(dataset, cn_type, workflow, recurrent_type):
     cn_type_folder_name = cn_type_map.get(cn_type, cn_type)
     data_dir = os.path.join(str(GISTIC_HOME), cn_type_folder_name)
 
-    workflow_name = workflow_map.get(workflow, workflow)
+    workflow_name = ora_workflow_map.get(workflow, workflow)
     folder_name = f'gistic_{dataset.name}.{workflow_name}'
     file_name = f'{recurrent_type}_genes.conf_95.txt'
 
