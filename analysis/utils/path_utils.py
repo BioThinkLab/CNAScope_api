@@ -94,7 +94,7 @@ def get_dataset_meta_path(dataset, workflow):
 def get_dataset_tree_path(dataset, workflow):
     data_dir = str(build_dataset_data_dir_path(dataset))
     workflow_name = workflow_map.get(workflow, workflow)
-    tree_name = f'{dataset.name}.{workflow_name}_cut64.json'
+    tree_name = f'{dataset.name}.{workflow_name}_cut50.json'
 
     return os.path.join(data_dir, 'out', tree_name)
 
