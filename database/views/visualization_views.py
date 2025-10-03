@@ -527,8 +527,8 @@ class CNAConsensusGeneView(APIView):
             for _, row in consensus_gene_df.iterrows():
                 data = {
                     "type": row["CNA_Type"],
-                    "modality_workflow": row["Modality_Workflow"],
-                    "n_modality_workflow": row["n_Modality_Workflow"],
+                    "modality_workflow": row["Protocol_Workflow"],
+                    "n_modality_workflow": row["n_Protocol_Workflow"],
                     "consensus_gene": row["consensus_gene"],
                     "n_consensus": row["n_consensus"]
                 }
