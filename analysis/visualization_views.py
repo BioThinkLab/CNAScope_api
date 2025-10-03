@@ -133,7 +133,7 @@ class CNATreeView(APIView):
                 }, status=status.HTTP_404_NOT_FOUND)
 
         output_dir = task.get_output_dir_absolute_path()
-        tree_path = os.path.join(output_dir, f'{task_uuid}_cut64.json')
+        tree_path = os.path.join(output_dir, f'{task_uuid}_cut50.json')
 
         try:
             with open(tree_path, 'r') as file:
