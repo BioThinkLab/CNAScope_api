@@ -19,5 +19,6 @@ urlpatterns = [
     path('ploidy_distribution/', visualization_views.PloidyDistributionView.as_view(), name='ploidy-distribution'),
     path('run_demo/', run_demo, name='run_demo'),
     path('download_task_data/', download_task_data, name='download_task_data'),
-
+    path('top_cn_variance/', visualization_views.TopCNVarianceView.as_view(), name='top-cn-variance'),
+    path('CNA_vector/', visualization_views.CNAVectorView.as_view(), name='CNA-vector'),
 ]
