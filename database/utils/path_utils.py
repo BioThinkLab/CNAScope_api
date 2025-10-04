@@ -12,6 +12,10 @@ source_map = {
     'scTML': 'scTML'
 }
 
+modality_map = {
+    'ST': 'spaRNA'
+}
+
 
 workflow_map = {
     'ASCAT2': 'ascat2',
@@ -64,7 +68,7 @@ ora_workflow_map = {
 
 
 def build_dataset_data_dir_path(dataset):
-    return os.path.join(DATA_HOME, dataset.modality, source_map[dataset.source])
+    return os.path.join(DATA_HOME, modality_map.get(dataset.modality, dataset.modality), source_map[dataset.source])
 
 
 def build_dataset_prefix(dataset, workflow):
