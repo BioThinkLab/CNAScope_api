@@ -95,7 +95,7 @@ def get_dataset_samples_path(dataset):
 def get_dataset_matrix_path(dataset, workflow, bin_size):
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
-    if dataset.source == 'GDC Portal' or (dataset.modality == 'ST' and dataset.source == 'scTML'):
+    if dataset.source == 'GDC Portal':
         data_dir = os.path.join(data_base_dir, 'clean', bin_size)
     else:
         data_dir = os.path.join(data_base_dir, 'clean')
