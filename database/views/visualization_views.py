@@ -463,7 +463,7 @@ class SpatialTopCNVarianceView(APIView):
         except Dataset.DoesNotExist:
             return Response({'error': 'Dataset does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        matrix_path = path_utils.get_dataset_top_cn_variance_path(dataset, workflow_type, bin_size)
+        matrix_path = path_utils.get_dataset_spatial_top_cn_variance_path(dataset, workflow_type, bin_size)
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="matrix.csv"'
