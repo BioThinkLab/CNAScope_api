@@ -260,6 +260,20 @@ def get_dataset_top_cn_variance_path(dataset, workflow, bin_size):
     return os.path.join(data_dir, file_name)
 
 
+def get_dataset_spatial_top_cn_variance_path(dataset, workflow, bin_size):
+    data_base_dir = str(build_dataset_data_dir_path(dataset))
+
+    if dataset.source == 'GDC Portal':
+        data_dir = os.path.join(data_base_dir, 'out', bin_size)
+    else:
+        data_dir = os.path.join(data_base_dir, 'out')
+
+    workflow_name = workflow_map.get(workflow, workflow)
+    file_name = f'{dataset.name}.{workflow_name}_top_CN_spatial_variance.csv'
+
+    return os.path.join(data_dir, file_name)
+
+
 def get_consensus_focal_gene_json_path(dataset_name):
     data_dir = os.path.join(GISTIC_HOME, 'consensus')
     file_name = f'{dataset_name}_focal_gene.json'

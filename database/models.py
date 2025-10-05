@@ -18,6 +18,8 @@ class Dataset(models.Model):
     platform = models.CharField(max_length=255, blank=True)
     workflow = models.CharField(max_length=255, blank=True)
     cn_type = models.CharField(max_length=255, blank=True)
+    raw_cn_scale = models.CharField(max_length=255, blank=True)
+    raw_locus_type = models.CharField(max_length=255, blank=True)
     reference = models.CharField(max_length=255, blank=True)
 
     # Clinical Information
@@ -28,6 +30,8 @@ class Dataset(models.Model):
     sample_num = models.PositiveIntegerField(blank=True, null=True)
     cell_num = models.PositiveIntegerField(blank=True, null=True)
     spot_num = models.PositiveIntegerField(blank=True, null=True)
+    after_qc_ratio = models.FloatField(blank=True, null=True)
+    usage_permission = models.CharField(max_length=255, blank=True)
 
     # Time Information
     created_at = models.DateTimeField(auto_now_add=True)

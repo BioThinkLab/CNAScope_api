@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import HttpResponse
 
-from database.models import Dataset, BulkSampleMetadata
-from database.serializers.dataset_serializers import DatasetSerializer, BulkSampleMetadataSerializer
+from database.models import Dataset
+from database.serializers.dataset_serializers import DatasetSerializer
 from database.utils import matrix_utils
 import os
 
