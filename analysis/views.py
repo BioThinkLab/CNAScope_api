@@ -551,10 +551,13 @@ def query_task(request):
             # 任务正在队列中等待
             task.status = pending_status
             task.save()
+
+            data = serializer(task).data
+            data['position'] = task_status.split(' ')[1]
             
             return Response({
                 "success": True,
-                "data": serializer(task).data,
+                "data": data,
                 "task_type": task_type
             }, status=status.HTTP_200_OK)
         
