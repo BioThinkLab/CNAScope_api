@@ -2,20 +2,18 @@ import os
 
 from CNAScope_api.constant import DATA_HOME, GISTIC_HOME
 
-
 source_map = {
     'cBioportal': 'cBioPortal',
     'COSMIC': 'COSMIC',
     'GDC Portal': 'GDC',
     '10x Official': '10x',
     'HSCGD': 'HSCGD',
-    'scTML': 'scTML'
+    'scTML': 'scTML',
 }
 
 modality_map = {
     'ST': 'spaRNA'
 }
-
 
 workflow_map = {
     'ASCAT2': 'ascat2',
@@ -68,7 +66,14 @@ ora_workflow_map = {
 
 
 def build_dataset_data_dir_path(dataset):
-    return os.path.join(DATA_HOME, modality_map.get(dataset.modality, dataset.modality), source_map[dataset.source])
+    if dataset.source == '10x Official' and dataset.modality == 'spaRNA':
+        dir_name = '10x_Xenium'
+    elif dataset.protocol == 'Slide-RNA-Seq v2' or dataset.protocol == 'Slide-DNA-Seq':
+        dir_name = 'slide'
+    else:
+        dir_name = source_map[dataset.source]
+
+    return os.path.join(DATA_HOME, modality_map.get(dataset.modality, dataset.modality), dir_name)
 
 
 def build_dataset_prefix(dataset, workflow):
