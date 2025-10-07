@@ -1,4 +1,6 @@
 import os
+import re
+import glob
 
 from CNAScope_api.constant import DATA_HOME, GISTIC_HOME
 
@@ -126,24 +128,29 @@ def get_dataset_meta_path(dataset, workflow, bin_size):
 
 
 def get_dataset_tree_path(dataset, workflow, bin_size):
-    tree_cut_map = {
-        '5M': 50,
-        '200kb': 5,
-        '500kb': 15
-    }
     data_base_dir = str(build_dataset_data_dir_path(dataset))
 
     if dataset.source == 'GDC Portal':
         data_dir = os.path.join(data_base_dir, 'out', bin_size)
-        cut_suffix = f'cut{tree_cut_map[bin_size]}'
     else:
         data_dir = os.path.join(data_base_dir, 'out')
-        cut_suffix = f'cut64'
 
     workflow_name = workflow_map.get(workflow, workflow)
-    tree_name = f'{dataset.name}.{workflow_name}_{cut_suffix}.json'
+    pattern = f"^{dataset.name}\.{workflow_name}_cut.*\.json$"
 
-    return os.path.join(data_dir, tree_name)
+    # 使用glob查找所有文件
+    files = [f for f in os.listdir(data_dir) if f.endswith('.json')]
+
+    # 匹配符合模式的文件
+    matched_files = [f for f in files if re.match(pattern, f)]
+
+    if matched_files:
+        # 获取第一个匹配文件的名称
+        first_matched_file = matched_files[0]
+
+        return os.path.join(data_dir, first_matched_file)
+    else:
+        return None
 
 
 def get_dataset_gene_matrix_path(dataset, workflow, bin_size):

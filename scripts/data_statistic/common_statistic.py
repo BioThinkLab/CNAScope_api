@@ -45,11 +45,14 @@ if __name__ == '__main__':
     print(f"Number of cell num: {cell_num}")
 
     spot_cancer_types = Dataset.objects.filter(
-        modality__in=['ST']
+        modality__in=['spaRNA']
     ).values('cancer_type').distinct().count()
     ST_samples = Dataset.objects.filter(
-        modality__in=['ST']
-    ).aggregate(total_sample_num=Sum('sample_num'))
+        modality__in=['spaRNA', 'spaDNA']
+    ).aggregate(
+        total_sample_num=Sum('spot_num'),
+        total_cell_num=Sum('cell_num'),
+    )
 
     print(f"Number of unique cancer_types: {spot_cancer_types}")
-    print(f"Number of unique samples: {ST_samples}")
+    print(f"Number of unique samples: {ST_samples['total_sample_num'] + ST_samples['total_cell_num']}")

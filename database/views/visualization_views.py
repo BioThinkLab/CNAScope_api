@@ -110,6 +110,9 @@ class CNATreeView(APIView):
 
         tree_path = path_utils.get_dataset_tree_path(dataset, workflow_type, bin_size)
 
+        if tree_path is None:
+            return Response('CNA tree file not found!', status=status.HTTP_404_NOT_FOUND)
+
         try:
             with open(tree_path, 'r') as file:
                 content = file.read()
