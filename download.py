@@ -258,13 +258,13 @@ for dataset in Dataset.objects.all():
                     term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, w, bin_size)
                     top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, w, bin_size)
 
-                    all_files.append((meta_file, os.path.join(bin_size, os.path.basename(cna_file))))
+                    all_files.append((meta_file, os.path.join(bin_size, os.path.basename(meta_file))))
                     all_files.append((cna_file, os.path.join(bin_size, os.path.basename(cna_file))))
                     all_files.append((newick_file, os.path.join(bin_size, os.path.basename(newick_file))))
                     all_files.append((gene_matrix_file, os.path.join(bin_size, os.path.basename(gene_matrix_file))))
                     all_files.append((term_matrix_file, os.path.join(bin_size, os.path.basename(term_matrix_file))))
                     all_files.append((top_cn_file, os.path.join(bin_size, os.path.basename(top_cn_file))))
-                for cn_type in cn_type_map.values():
+                for cn_type in cn_type_map.keys():
                     amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'amp')
                     del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'del')
                     scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, w)
@@ -294,7 +294,7 @@ for dataset in Dataset.objects.all():
                 term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, w, '')
                 top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, w, '')
 
-                all_files.append((meta_file, os.path.basename(cna_file)))
+                all_files.append((meta_file, os.path.basename(meta_file)))
                 all_files.append((cna_file, os.path.basename(cna_file)))
                 all_files.append((newick_file, os.path.basename(newick_file)))
                 all_files.append((gene_matrix_file, os.path.basename(gene_matrix_file)))
@@ -315,13 +315,13 @@ for dataset in Dataset.objects.all():
                 term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, workflow, bin_size)
                 top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, workflow, bin_size)
 
-                all_files.append((meta_file, os.path.join(bin_size, os.path.basename(cna_file))))
+                all_files.append((meta_file, os.path.join(bin_size, os.path.basename(meta_file))))
                 all_files.append((cna_file, os.path.join(bin_size, os.path.basename(cna_file))))
                 all_files.append((newick_file, os.path.join(bin_size, os.path.basename(newick_file))))
                 all_files.append((gene_matrix_file, os.path.join(bin_size, os.path.basename(gene_matrix_file))))
                 all_files.append((term_matrix_file, os.path.join(bin_size, os.path.basename(term_matrix_file))))
                 all_files.append((top_cn_file, os.path.join(bin_size, os.path.basename(top_cn_file))))
-            for cn_type in cn_type_map.values():
+            for cn_type in cn_type_map.keys():
                 amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'amp')
                 del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'del')
                 scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, workflow)
@@ -351,7 +351,7 @@ for dataset in Dataset.objects.all():
             term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, workflow, '')
             top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, workflow, '')
 
-            all_files.append((meta_file, os.path.basename(cna_file)))
+            all_files.append((meta_file, os.path.basename(meta_file)))
             all_files.append((cna_file, os.path.basename(cna_file)))
             all_files.append((newick_file, os.path.basename(newick_file)))
             all_files.append((gene_matrix_file, os.path.basename(gene_matrix_file)))
