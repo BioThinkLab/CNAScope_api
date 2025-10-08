@@ -277,9 +277,9 @@ for dataset in Dataset.objects.all():
                         all_files.append((seg_path, os.path.join('gistic2', cn_type, os.path.basename(seg_path))))
                         all_files.append((ora_csv_path, os.path.join('gistic2', cn_type, os.path.basename(ora_csv_path))))
                     
-                    consensus_cna = path_utils.get_consensus_cna_csv_path(name, w)
-                    consensus_gene = path_utils.get_consensus_gene_csv_path(name, w)
-                    consensus_term = path_utils.get_consensus_term_csv_path(name, w)
+                    consensus_cna = path_utils.get_consensus_cna_csv_path(name)
+                    consensus_gene = path_utils.get_consensus_gene_csv_path(name)
+                    consensus_term = path_utils.get_consensus_term_csv_path(name)
                     consensus_focal = path_utils.get_ora_csv_path(name, 'consensus', 'consensus')
 
                     all_files.append((consensus_cna, os.path.join('gistic2', 'consensus', os.path.basename(consensus_cna))))
@@ -334,9 +334,9 @@ for dataset in Dataset.objects.all():
                     all_files.append((seg_path, os.path.join('gistic2', cn_type, os.path.basename(seg_path))))
                     all_files.append((ora_csv_path, os.path.join('gistic2', cn_type, os.path.basename(ora_csv_path))))
                 
-                consensus_cna = path_utils.get_consensus_cna_csv_path(name, workflow)
-                consensus_gene = path_utils.get_consensus_gene_csv_path(name, workflow)
-                consensus_term = path_utils.get_consensus_term_csv_path(name, workflow)
+                consensus_cna = path_utils.get_consensus_cna_csv_path(name)
+                consensus_gene = path_utils.get_consensus_gene_csv_path(name)
+                consensus_term = path_utils.get_consensus_term_csv_path(name)
                 consensus_focal = path_utils.get_ora_csv_path(name, 'consensus', 'consensus')
 
                 all_files.append((consensus_cna, os.path.join('gistic2', 'consensus', os.path.basename(consensus_cna))))
