@@ -49,7 +49,9 @@ workflow_map = {
     'Sequenza-CNVkit': 'Sequenza-CNVkit',
     'SNP-FASST2': 'SNP-FASST2',
     'tCoNut': 'tCoNut',
-    'NA': 'nan'
+    'Slide-DNA-Seq': 'Slide_DNA_Seq',
+    'NA': 'nan',
+    '': 'nan',
 }
 
 cn_type_map = {
