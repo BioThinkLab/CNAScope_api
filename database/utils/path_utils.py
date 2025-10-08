@@ -306,4 +306,4 @@ def get_ora_csv_path(dataset_name, cn_type, workflow):
 
     folder_name = f'gistic_{dataset_name}.{ora_workflow_map[workflow]}'
 
-    return os.path.join(GISTIC_HOME, cn_type_map[cn_type], folder_name, 'ora', 'ora_results.csv')
+    return os.path.join(GISTIC_HOME, cn_type_map[cn_type], folder_name, 'ora', 'focal_term.csv')
