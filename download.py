@@ -264,19 +264,19 @@ for dataset in Dataset.objects.all():
                         all_files.append((gene_matrix_file, os.path.join(bin_size, os.path.basename(gene_matrix_file))))
                         all_files.append((term_matrix_file, os.path.join(bin_size, os.path.basename(term_matrix_file))))
                         all_files.append((top_cn_file, os.path.join(bin_size, os.path.basename(top_cn_file))))
-                    for cn_type in cn_type_map.keys():
-                        amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'amp')
-                        del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'del')
-                        scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, w)
-                        seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, w)
-                        ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, w)
+                    cn_type = 'allele'
+                    amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'amp')
+                    del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'del')
+                    scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, w)
+                    seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, w)
+                    ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, w)
 
-                        all_files.append((amp_gene_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(amp_gene_path))))
-                        all_files.append((del_gene_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(del_gene_path))))
-                        all_files.append((scores_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(scores_path))))
-                        all_files.append((seg_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(seg_path))))
-                        all_files.append((ora_csv_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(ora_csv_path))))
-                    
+                    all_files.append((amp_gene_path, os.path.join('gistic2', cn_type_map[cn_type], w, os.path.basename(amp_gene_path))))
+                    all_files.append((del_gene_path, os.path.join('gistic2', cn_type_map[cn_type], w, os.path.basename(del_gene_path))))
+                    all_files.append((scores_path, os.path.join('gistic2', cn_type_map[cn_type], w, os.path.basename(scores_path))))
+                    all_files.append((seg_path, os.path.join('gistic2', cn_type_map[cn_type], w, os.path.basename(seg_path))))
+                    all_files.append((ora_csv_path, os.path.join('gistic2', cn_type_map[cn_type], w, os.path.basename(ora_csv_path))))
+                
                     consensus_cna = path_utils.get_consensus_cna_csv_path(name)
                     consensus_gene = path_utils.get_consensus_gene_csv_path(name)
                     consensus_term = path_utils.get_consensus_term_csv_path(name)
@@ -304,6 +304,20 @@ for dataset in Dataset.objects.all():
                     if dataset.modality in ['spaDNA', 'spaRNA']:
                         spatial_file = path_utils.get_dataset_spatial_top_cn_variance_path(dataset, w, '')
                         all_files.append((spatial_file, os.path.basename(spatial_file)))
+            if dataset.source == 'GDC Portal':
+                for cn_type in cn_type_map.keys():
+                    if cn_type != 'allele':
+                        for spe in ['GATK4 CNV', 'DNAcopy']:
+                            amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, spe, 'amp')
+                            del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, spe, 'del')
+                            scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, spe)
+                            seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, spe)
+                            ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, spe)
+                            all_files.append((amp_gene_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(amp_gene_path))))
+                            all_files.append((del_gene_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(del_gene_path))))
+                            all_files.append((scores_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(scores_path))))
+                            all_files.append((seg_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(seg_path))))
+                            all_files.append((ora_csv_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(ora_csv_path))))
         else:
             all_files = []
             if source == 'GDC Portal':
@@ -322,17 +336,29 @@ for dataset in Dataset.objects.all():
                     all_files.append((term_matrix_file, os.path.join(bin_size, os.path.basename(term_matrix_file))))
                     all_files.append((top_cn_file, os.path.join(bin_size, os.path.basename(top_cn_file))))
                 for cn_type in cn_type_map.keys():
-                    amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'amp')
-                    del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'del')
-                    scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, workflow)
-                    seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, workflow)
-                    ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, workflow)
-
-                    all_files.append((amp_gene_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(amp_gene_path))))
-                    all_files.append((del_gene_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(del_gene_path))))
-                    all_files.append((scores_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(scores_path))))
-                    all_files.append((seg_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(seg_path))))
-                    all_files.append((ora_csv_path, os.path.join('gistic2', cn_type_map[cn_type], os.path.basename(ora_csv_path))))
+                    if cn_type == 'allele':
+                        amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'amp')
+                        del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'del')
+                        scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, workflow)
+                        seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, workflow)
+                        ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, workflow)
+                        all_files.append((amp_gene_path, os.path.join('gistic2', cn_type_map[cn_type], workflow, os.path.basename(amp_gene_path))))
+                        all_files.append((del_gene_path, os.path.join('gistic2', cn_type_map[cn_type], workflow, os.path.basename(del_gene_path))))
+                        all_files.append((scores_path, os.path.join('gistic2', cn_type_map[cn_type], workflow, os.path.basename(scores_path))))
+                        all_files.append((seg_path, os.path.join('gistic2', cn_type_map[cn_type], workflow, os.path.basename(seg_path))))
+                        all_files.append((ora_csv_path, os.path.join('gistic2', cn_type_map[cn_type], workflow, os.path.basename(ora_csv_path))))
+                    else:
+                        for spe in ['GATK4 CNV', 'DNAcopy']:
+                            amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, spe, 'amp')
+                            del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, spe, 'del')
+                            scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, spe)
+                            seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, spe)
+                            ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, spe)
+                            all_files.append((amp_gene_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(amp_gene_path))))
+                            all_files.append((del_gene_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(del_gene_path))))
+                            all_files.append((scores_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(scores_path))))
+                            all_files.append((seg_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(seg_path))))
+                            all_files.append((ora_csv_path, os.path.join('gistic2', cn_type_map[cn_type], spe, os.path.basename(ora_csv_path))))
                 
                 consensus_cna = path_utils.get_consensus_cna_csv_path(name)
                 consensus_gene = path_utils.get_consensus_gene_csv_path(name)
