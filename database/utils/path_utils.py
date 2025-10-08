@@ -309,6 +309,17 @@ def get_consensus_gene_csv_path(dataset_name):
 
     return os.path.join(data_dir, file_name)
 
+def get_consensus_cna_csv_path(dataset_name):
+    data_dir = os.path.join(GISTIC_HOME, 'consensus')
+    file_name = f'{dataset_name}_consensus_cna.csv'
+
+    return os.path.join(data_dir, file_name)
+
+def get_consensus_term_csv_path(dataset_name):
+    data_dir = os.path.join(GISTIC_HOME, 'consensus')
+    file_name = f'{dataset_name}_consensus_term.csv'
+
+    return os.path.join(data_dir, file_name)
 
 def get_ora_csv_path(dataset_name, cn_type, workflow):
     if cn_type == 'consensus' and workflow == 'consensus':
