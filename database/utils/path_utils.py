@@ -306,6 +306,7 @@ def get_ora_csv_path(dataset_name, cn_type, workflow):
     if cn_type == 'consensus' and workflow == 'consensus':
         return os.path.join(GISTIC_HOME, 'consensus', f'{dataset_name}_consensus_term.csv')
 
-    folder_name = f'gistic_{dataset_name}.{ora_workflow_map[workflow]}'
+    workflow_name = ora_workflow_map.get(workflow, workflow)
+    folder_name = f'gistic_{dataset_name}.{workflow_name}'
 
     return os.path.join(GISTIC_HOME, cn_type_map[cn_type], folder_name, 'ora', 'focal_term.csv')
