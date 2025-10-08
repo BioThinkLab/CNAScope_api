@@ -241,8 +241,7 @@ cn_type_map = {
     'cns': 'copy-number-segment',
     'mcns': 'masked-copy-number-segment'
 }
-for dataset in Dataset.objects.filter(source='GDC Portal'):
-# for dataset in Dataset.objects.all():
+for dataset in Dataset.objects.all():
     name = dataset.name
     workflow = dataset.workflow
     source = dataset.source
