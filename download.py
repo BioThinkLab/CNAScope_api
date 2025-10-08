@@ -245,18 +245,75 @@ for dataset in Dataset.objects.all():
     name = dataset.name
     workflow = dataset.workflow
     source = dataset.source
+    try:
+        if ',' in workflow:
+            all_files = []
+            for w in workflow.split(','):
+                if source == 'GDC Portal':
+                    for bin_size in bin_sizes:
+                        cna_file = path_utils.get_dataset_matrix_path(dataset, w, bin_size)
+                        meta_file = path_utils.get_dataset_meta_path(dataset, w, bin_size)
+                        newick_file = path_utils.get_dataset_newick_path(dataset, w, bin_size)
+                        gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, w, bin_size)
+                        term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, w, bin_size)
+                        top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, w, bin_size)
 
-    if ',' in workflow:
-        all_files = []
-        for w in workflow.split(','):
+                        all_files.append((meta_file, os.path.join(bin_size, os.path.basename(meta_file))))
+                        all_files.append((cna_file, os.path.join(bin_size, os.path.basename(cna_file))))
+                        all_files.append((newick_file, os.path.join(bin_size, os.path.basename(newick_file))))
+                        all_files.append((gene_matrix_file, os.path.join(bin_size, os.path.basename(gene_matrix_file))))
+                        all_files.append((term_matrix_file, os.path.join(bin_size, os.path.basename(term_matrix_file))))
+                        all_files.append((top_cn_file, os.path.join(bin_size, os.path.basename(top_cn_file))))
+                    for cn_type in cn_type_map.keys():
+                        amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'amp')
+                        del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'del')
+                        scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, w)
+                        seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, w)
+                        ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, w)
+
+                        all_files.append((amp_gene_path, os.path.join('gistic2', cn_type, os.path.basename(amp_gene_path))))
+                        all_files.append((del_gene_path, os.path.join('gistic2', cn_type, os.path.basename(del_gene_path))))
+                        all_files.append((scores_path, os.path.join('gistic2', cn_type, os.path.basename(scores_path))))
+                        all_files.append((seg_path, os.path.join('gistic2', cn_type, os.path.basename(seg_path))))
+                        all_files.append((ora_csv_path, os.path.join('gistic2', cn_type, os.path.basename(ora_csv_path))))
+                    
+                    consensus_cna = path_utils.get_consensus_cna_csv_path(name, w)
+                    consensus_gene = path_utils.get_consensus_gene_csv_path(name, w)
+                    consensus_term = path_utils.get_consensus_term_csv_path(name, w)
+                    consensus_focal = path_utils.get_ora_csv_path(name, 'consensus', 'consensus')
+
+                    all_files.append((consensus_cna, os.path.join('gistic2', 'consensus', os.path.basename(consensus_cna))))
+                    all_files.append((consensus_gene, os.path.join('gistic2', 'consensus', os.path.basename(consensus_gene))))
+                    all_files.append((consensus_term, os.path.join('gistic2', 'consensus', os.path.basename(consensus_term))))
+                    all_files.append((consensus_focal, os.path.join('gistic2', 'consensus', os.path.basename(consensus_focal))))
+                else:
+                    cna_file = path_utils.get_dataset_matrix_path(dataset, w, '')
+                    meta_file = path_utils.get_dataset_meta_path(dataset, w, '')
+                    newick_file = path_utils.get_dataset_newick_path(dataset, w, '')
+                    gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, w, '')
+                    term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, w, '')
+                    top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, w, '')
+
+                    all_files.append((meta_file, os.path.basename(meta_file)))
+                    all_files.append((cna_file, os.path.basename(cna_file)))
+                    all_files.append((newick_file, os.path.basename(newick_file)))
+                    all_files.append((gene_matrix_file, os.path.basename(gene_matrix_file)))
+                    all_files.append((term_matrix_file, os.path.basename(term_matrix_file)))
+                    all_files.append((top_cn_file, os.path.basename(top_cn_file)))
+
+                    if dataset.modality in ['spaDNA', 'spaRNA']:
+                        spatial_file = path_utils.get_dataset_spatial_top_cn_variance_path(dataset, w, '')
+                        all_files.append((spatial_file, os.path.basename(spatial_file)))
+        else:
+            all_files = []
             if source == 'GDC Portal':
                 for bin_size in bin_sizes:
-                    cna_file = path_utils.get_dataset_matrix_path(dataset, w, bin_size)
-                    meta_file = path_utils.get_dataset_meta_path(dataset, w, bin_size)
-                    newick_file = path_utils.get_dataset_newick_path(dataset, w, bin_size)
-                    gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, w, bin_size)
-                    term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, w, bin_size)
-                    top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, w, bin_size)
+                    cna_file = path_utils.get_dataset_matrix_path(dataset, workflow, bin_size)
+                    meta_file = path_utils.get_dataset_meta_path(dataset, workflow, bin_size)
+                    newick_file = path_utils.get_dataset_newick_path(dataset, workflow, bin_size)
+                    gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, workflow, bin_size)
+                    term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, workflow, bin_size)
+                    top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, workflow, bin_size)
 
                     all_files.append((meta_file, os.path.join(bin_size, os.path.basename(meta_file))))
                     all_files.append((cna_file, os.path.join(bin_size, os.path.basename(cna_file))))
@@ -265,11 +322,11 @@ for dataset in Dataset.objects.all():
                     all_files.append((term_matrix_file, os.path.join(bin_size, os.path.basename(term_matrix_file))))
                     all_files.append((top_cn_file, os.path.join(bin_size, os.path.basename(top_cn_file))))
                 for cn_type in cn_type_map.keys():
-                    amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'amp')
-                    del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, w, 'del')
-                    scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, w)
-                    seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, w)
-                    ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, w)
+                    amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'amp')
+                    del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'del')
+                    scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, workflow)
+                    seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, workflow)
+                    ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, workflow)
 
                     all_files.append((amp_gene_path, os.path.join('gistic2', cn_type, os.path.basename(amp_gene_path))))
                     all_files.append((del_gene_path, os.path.join('gistic2', cn_type, os.path.basename(del_gene_path))))
@@ -277,9 +334,9 @@ for dataset in Dataset.objects.all():
                     all_files.append((seg_path, os.path.join('gistic2', cn_type, os.path.basename(seg_path))))
                     all_files.append((ora_csv_path, os.path.join('gistic2', cn_type, os.path.basename(ora_csv_path))))
                 
-                consensus_cna = path_utils.get_consensus_cna_csv_path(name, w)
-                consensus_gene = path_utils.get_consensus_gene_csv_path(name, w)
-                consensus_term = path_utils.get_consensus_term_csv_path(name, w)
+                consensus_cna = path_utils.get_consensus_cna_csv_path(name, workflow)
+                consensus_gene = path_utils.get_consensus_gene_csv_path(name, workflow)
+                consensus_term = path_utils.get_consensus_term_csv_path(name, workflow)
                 consensus_focal = path_utils.get_ora_csv_path(name, 'consensus', 'consensus')
 
                 all_files.append((consensus_cna, os.path.join('gistic2', 'consensus', os.path.basename(consensus_cna))))
@@ -287,12 +344,12 @@ for dataset in Dataset.objects.all():
                 all_files.append((consensus_term, os.path.join('gistic2', 'consensus', os.path.basename(consensus_term))))
                 all_files.append((consensus_focal, os.path.join('gistic2', 'consensus', os.path.basename(consensus_focal))))
             else:
-                cna_file = path_utils.get_dataset_matrix_path(dataset, w, '')
-                meta_file = path_utils.get_dataset_meta_path(dataset, w, '')
-                newick_file = path_utils.get_dataset_newick_path(dataset, w, '')
-                gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, w, '')
-                term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, w, '')
-                top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, w, '')
+                cna_file = path_utils.get_dataset_matrix_path(dataset, workflow, '')
+                meta_file = path_utils.get_dataset_meta_path(dataset, workflow, '')
+                newick_file = path_utils.get_dataset_newick_path(dataset, workflow, '')
+                gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, workflow, '')
+                term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, workflow, '')
+                top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, workflow, '')
 
                 all_files.append((meta_file, os.path.basename(meta_file)))
                 all_files.append((cna_file, os.path.basename(cna_file)))
@@ -302,65 +359,10 @@ for dataset in Dataset.objects.all():
                 all_files.append((top_cn_file, os.path.basename(top_cn_file)))
 
                 if dataset.modality in ['spaDNA', 'spaRNA']:
-                    spatial_file = path_utils.get_dataset_spatial_top_cn_variance_path(dataset, w, '')
+                    spatial_file = path_utils.get_dataset_spatial_top_cn_variance_path(dataset, workflow, '')
                     all_files.append((spatial_file, os.path.basename(spatial_file)))
-    else:
-        all_files = []
-        if source == 'GDC Portal':
-            for bin_size in bin_sizes:
-                cna_file = path_utils.get_dataset_matrix_path(dataset, workflow, bin_size)
-                meta_file = path_utils.get_dataset_meta_path(dataset, workflow, bin_size)
-                newick_file = path_utils.get_dataset_newick_path(dataset, workflow, bin_size)
-                gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, workflow, bin_size)
-                term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, workflow, bin_size)
-                top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, workflow, bin_size)
 
-                all_files.append((meta_file, os.path.join(bin_size, os.path.basename(meta_file))))
-                all_files.append((cna_file, os.path.join(bin_size, os.path.basename(cna_file))))
-                all_files.append((newick_file, os.path.join(bin_size, os.path.basename(newick_file))))
-                all_files.append((gene_matrix_file, os.path.join(bin_size, os.path.basename(gene_matrix_file))))
-                all_files.append((term_matrix_file, os.path.join(bin_size, os.path.basename(term_matrix_file))))
-                all_files.append((top_cn_file, os.path.join(bin_size, os.path.basename(top_cn_file))))
-            for cn_type in cn_type_map.keys():
-                amp_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'amp')
-                del_gene_path = path_utils.get_dataset_recurrent_gene_path(dataset, cn_type, workflow, 'del')
-                scores_path = path_utils.get_dataset_recurrent_scores_path(dataset, cn_type, workflow)
-                seg_path = path_utils.get_dataset_recurrent_seg_path(dataset, cn_type, workflow)
-                ora_csv_path = path_utils.get_ora_csv_path(name, cn_type, workflow)
-
-                all_files.append((amp_gene_path, os.path.join('gistic2', cn_type, os.path.basename(amp_gene_path))))
-                all_files.append((del_gene_path, os.path.join('gistic2', cn_type, os.path.basename(del_gene_path))))
-                all_files.append((scores_path, os.path.join('gistic2', cn_type, os.path.basename(scores_path))))
-                all_files.append((seg_path, os.path.join('gistic2', cn_type, os.path.basename(seg_path))))
-                all_files.append((ora_csv_path, os.path.join('gistic2', cn_type, os.path.basename(ora_csv_path))))
-            
-            consensus_cna = path_utils.get_consensus_cna_csv_path(name, workflow)
-            consensus_gene = path_utils.get_consensus_gene_csv_path(name, workflow)
-            consensus_term = path_utils.get_consensus_term_csv_path(name, workflow)
-            consensus_focal = path_utils.get_ora_csv_path(name, 'consensus', 'consensus')
-
-            all_files.append((consensus_cna, os.path.join('gistic2', 'consensus', os.path.basename(consensus_cna))))
-            all_files.append((consensus_gene, os.path.join('gistic2', 'consensus', os.path.basename(consensus_gene))))
-            all_files.append((consensus_term, os.path.join('gistic2', 'consensus', os.path.basename(consensus_term))))
-            all_files.append((consensus_focal, os.path.join('gistic2', 'consensus', os.path.basename(consensus_focal))))
-        else:
-            cna_file = path_utils.get_dataset_matrix_path(dataset, workflow, '')
-            meta_file = path_utils.get_dataset_meta_path(dataset, workflow, '')
-            newick_file = path_utils.get_dataset_newick_path(dataset, workflow, '')
-            gene_matrix_file = path_utils.get_dataset_gene_matrix_csv_path(dataset, workflow, '')
-            term_matrix_file = path_utils.get_dataset_term_matrix_csv_path(dataset, workflow, '')
-            top_cn_file = path_utils.get_dataset_top_cn_variance_path(dataset, workflow, '')
-
-            all_files.append((meta_file, os.path.basename(meta_file)))
-            all_files.append((cna_file, os.path.basename(cna_file)))
-            all_files.append((newick_file, os.path.basename(newick_file)))
-            all_files.append((gene_matrix_file, os.path.basename(gene_matrix_file)))
-            all_files.append((term_matrix_file, os.path.basename(term_matrix_file)))
-            all_files.append((top_cn_file, os.path.basename(top_cn_file)))
-
-            if dataset.modality in ['spaDNA', 'spaRNA']:
-                spatial_file = path_utils.get_dataset_spatial_top_cn_variance_path(dataset, workflow, '')
-                all_files.append((spatial_file, os.path.basename(spatial_file)))
-
-    zip_file_name = os.path.join('/home/platform/workspace/CNAScope/data/download_zips', f'{name}.zip')
-    compress_existing_files(all_files, zip_file_name, empty_log)
+        zip_file_name = os.path.join('/home/platform/workspace/CNAScope/data/download_zips', f'{name}.zip')
+        compress_existing_files(all_files, zip_file_name, empty_log)
+    except:
+        continue
